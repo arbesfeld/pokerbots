@@ -1,0 +1,6 @@
+# This file tells git what to not include in the commit history
+# Don't change this file unless you know what you're doing
+
+/*.db
+*/bin/
+*/bin1/
