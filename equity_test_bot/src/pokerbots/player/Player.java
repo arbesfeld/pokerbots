@@ -9,21 +9,11 @@ public class Player {
 	private final PrintWriter outStream;
 	private final BufferedReader inStream;
 	
-	//instantiated every match
-	private String myName, oppName; //historian
-	private int stackSize, bb; //historian
 	private double timeBank; //keep in player
 	
-	//instantiated every hand
-	private int handId, myBank, oppBank; //brain
-	private boolean button; //brain
-	private Card[] hand; //brain
-	
-	//instantiated every action
-	private int potSize, numBoardCards, numLastActions, numLegalActions; //brain
-	private Card[] board; //brain
-	private Action[] lastActions, legalActions; //brain
-	
+	Brain brain;
+	Historian maj;
+
 	public Player(PrintWriter output, BufferedReader input) {
 		this.outStream = output;
 		this.inStream = input;
@@ -63,12 +53,14 @@ public class Player {
 		String word = tokens[0];
 		
 		if ("NEWGAME".compareToIgnoreCase(word) == 0) {
-			myName =    tokens[1];
-			oppName =   tokens[2];
-			stackSize = Integer.parseInt(tokens[3]);
-			bb =        Integer.parseInt(tokens[4]);
+			String myName =    tokens[1];
+			String oppName =   tokens[2];
+			int stackSize =    Integer.parseInt(tokens[3]);
+			int bb =           Integer.parseInt(tokens[4]);
+			
 			timeBank =  Double.parseDouble(tokens[5]);
 			
+			maj = new Historian(myName, oppName, stackSize, bb);
 			//newGame();
 		} 
 		
@@ -77,44 +69,46 @@ public class Player {
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
-			handId = Integer.parseInt(tokens[1]);
-			button = Boolean.parseBoolean(tokens[2]);
+			brain = new Brain();
+			brain.handId = Integer.parseInt(tokens[1]);
+			brain.button = Boolean.parseBoolean(tokens[2]);
 			
-			hand = new Card[3];
-			hand[0] = CardUtils.getCardByString(tokens[3]);
-			hand[1] = CardUtils.getCardByString(tokens[4]);
-			hand[2] = CardUtils.getCardByString(tokens[5]);
+			brain.hand = new Card[3];
+			brain.hand[0] = CardUtils.getCardByString(tokens[3]);
+			brain.hand[1] = CardUtils.getCardByString(tokens[4]);
+			brain.hand[2] = CardUtils.getCardByString(tokens[5]);
 		
-			board = new Card[5];
+			brain.board = new Card[5];
 			
-			myBank = Integer.parseInt(tokens[6]);
-			oppBank = Integer.parseInt(tokens[7]);
+			brain.myBank = Integer.parseInt(tokens[6]);
+			brain.oppBank = Integer.parseInt(tokens[7]);
+			
 			timeBank = Double.parseDouble(tokens[8]);
 			
 			//newHand();
 		}
 		
 		else if ("GETACTION".compareToIgnoreCase(word) == 0) {
-			potSize = Integer.parseInt(tokens[1]);
+			brain.potSize = Integer.parseInt(tokens[1]);
 			
-			numBoardCards = Integer.parseInt(tokens[2]);
+			brain.numBoardCards = Integer.parseInt(tokens[2]);
 			int i = 3;
-			for( ; i < numBoardCards + 3; i++)
-				board[i - 3] = CardUtils.getCardByString(tokens[i]);
+			for( ; i < brain.numBoardCards + 3; i++)
+				brain.board[i - 3] = CardUtils.getCardByString(tokens[i]);
 			
-			numLastActions = Integer.parseInt(tokens[i]);
+			brain.numLastActions = Integer.parseInt(tokens[i]);
 			int j = i+1;
-			for( ; j < numLastActions + i; j++) 
-				lastActions[j - i] = ActionUtils.getActionByString(tokens[j]);
+			for( ; j < brain.numLastActions + i; j++) 
+				brain.lastActions[j - i] = ActionUtils.getActionByString(tokens[j]);
 			
-			numLegalActions = Integer.parseInt(tokens[j]);
+			brain.numLegalActions = Integer.parseInt(tokens[j]);
 			int k = j+1;
-			for( ; k < numLegalActions + j; k++)
-				legalActions[k - j] = ActionUtils.getActionByString(tokens[k]);
+			for( ; k < brain.numLegalActions + j; k++)
+				brain.legalActions[k - j] = ActionUtils.getActionByString(tokens[k]);
 			
 			timeBank = Integer.parseInt(tokens[k]);
 			
-			//performAction();
+			brain.act();
 		}
 		
 		else if ("HANDOVER".compareToIgnoreCase(word) == 0) {
