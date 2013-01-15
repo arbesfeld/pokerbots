@@ -8,17 +8,17 @@ public class equity_test_bot {
 	}
 	
 	public static void main(String[] args) {
-		Card h1 = g("Js");
-		Card h2 = g("6d");
+		Card h1 = g("Ah");
+		Card h2 = g("Ad");
 		Card h3 = new Card(4, 3);
 		
 		Card f1 = new Card(14, 1);
 		Card f2 = new Card(13, 2);
 		Card f3 = new Card(9, 1);
 		
-		Card b1 = new Card(4, 0);
-		Card b2 = new Card(5, 0);
-		Card b3 = new Card(6, 0);
+		Card b1 = g("4s");
+		Card b2 = g("5s");
+		Card b3 = g("6s");
 		Card b4 = new Card(13, 0);
 		Card b5 = new Card(14, 2);
 		
@@ -26,9 +26,9 @@ public class equity_test_bot {
 		Card[] hand2 = {f1, f2};
 		Card[] board = new Card[5];
 		
-		//board[0] = b1;
-		//board[1] = b2;
-		//board[2] = b3;
+		board[0] = b1;
+		board[1] = b2;
+		board[2] = b3;
 		//board[3] = b4;
 		//board[4] = b5;
 		//Card[] board = {b1, b2, b3};// b4, b5};
@@ -38,7 +38,7 @@ public class equity_test_bot {
 	
 		long time1 = System.nanoTime();
 		
-		EquityCalculator e1 = new EquityCalculator(hand1, null);
+		EquityCalculator e1 = new EquityCalculator(hand1, board);
 		System.out.println("\nEquity hand1: ");
 		System.out.println(e1.calculateTotalEquity());
 		

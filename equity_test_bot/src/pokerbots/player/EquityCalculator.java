@@ -6,7 +6,7 @@ public class EquityCalculator {
 	private Card[] board; //0, 3, 4, or 5 card board depending on stage in the game
 	private boolean usedCards[]; //usedCards[i] is true if card with id=i is in hand or board
 	private int winningBoards, possibleBoards;
-	private int skip; //how many cards you should scan "ie. monte carlo method where 1 = all cards"
+	private int skip, skip2; //how many cards you should scan "ie. monte carlo method where 1 = all cards"
 	private int offset; //only used if skip is not 1
 	
 	public final int cardCount = 52;
@@ -16,7 +16,7 @@ public class EquityCalculator {
 		winningBoards =  0;
 		possibleBoards = 0;
 		skip =           3;
-		offset = skip == 1 ? 0 : 1;
+		skip2 =          2;
 		
 		for(int i = 0; i < cardCount; i++)
 			cardByID[i] = CardUtils.getCardByID(i);
@@ -126,7 +126,7 @@ public class EquityCalculator {
 	private double equityPostTurn() {
 		board[4] = new Card(-1, -1); //placeholder
 		
-		for(int i = offset; i < cardCount; i += skip) {
+		for(int i = 0; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
 		
@@ -146,13 +146,13 @@ public class EquityCalculator {
 		
 		//iterate through all possible opponent hands
 		//note that two card opponent hand is an approximation
-		for(int i = 0; i < cardCount; i += 2) {
+		for(int i = 0; i < cardCount; i += skip2) {
 			if(usedCards[i])
 				continue;
 			
 			opponentHand[0] = cardByID[i];
 			
-			for(int j = i+1; j < cardCount; j += 2) {
+			for(int j = i+1; j < cardCount; j += skip2) {
 				if(usedCards[j])
 					continue;
 				

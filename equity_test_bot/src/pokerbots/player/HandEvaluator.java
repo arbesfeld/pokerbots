@@ -72,15 +72,15 @@ public class HandEvaluator {
 	    	straightFlush = straightFlush(flush);
 	    
 		if(straightFlush != -1)                       //straight flush
-			return new HandRank(8, straight, 0, topVal, botVal);
+			return new HandRank(8, straight, 0, 0, 0);
 		else if(kind[4] != 0)                         //four of a kind
-			return new HandRank(7, kind[4], 0, topVal, botVal); 
+			return new HandRank(7, kind[4], 0, topVal, 0); 
 		else if(kind[3] != 0 && kind[2] != 0)         //full house
-			return new HandRank(6, kind[3], kind[2], topVal, botVal);
+			return new HandRank(6, kind[3], kind[2], 0, 0);
 		else if(flush != -1)                          //flush
 			return new HandRank(5, 0, 0, topVal, botVal);
 		else if(straight != -1)                       //straight
-			return new HandRank(4, straight, 0, topVal, botVal);
+			return new HandRank(4, straight, 0, 0, 0);
 		else if(kind[3] != 0)                         //three of a kind
 			return new HandRank(3, kind[3], 0, topVal, botVal);
 		else if(kind[2] != 0 && kind[1] != 0)         //two pair

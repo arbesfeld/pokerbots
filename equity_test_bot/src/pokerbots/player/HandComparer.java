@@ -8,7 +8,7 @@ public class HandComparer {
 		HandRank rankOpponent = HandEvaluator.getHandRank(opponentHand, board);
 		
 		//our hand is better or equal
-		if(rank1.compareTo(rankOpponent) >= 0)
+		if(rank1.compareTo(rankOpponent) > 0)
 			return true;
 		else
 			return false;
