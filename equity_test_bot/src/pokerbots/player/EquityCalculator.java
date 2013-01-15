@@ -47,6 +47,9 @@ public class EquityCalculator {
 		return (double) winningBoards / possibleBoards;
 	}
 	public double calculateTotalEquity() {
+		winningBoards = 0;
+		possibleBoards = 0;
+		
 		//pre-flop
 		if(board == null) {
 			return equityPreFlop();

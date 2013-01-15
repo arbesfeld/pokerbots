@@ -10,19 +10,19 @@ public class Player {
 	private final BufferedReader inStream;
 	
 	//instantiated every match
-	private String myName, oppName;
-	private int stackSize, bb;
-	private double timeBank;
+	private String myName, oppName; //historian
+	private int stackSize, bb; //historian
+	private double timeBank; //keep in player
 	
 	//instantiated every hand
-	private int handId, myBank, oppBank;
-	private boolean button;
-	private Card[] hand;
+	private int handId, myBank, oppBank; //brain
+	private boolean button; //brain
+	private Card[] hand; //brain
 	
 	//instantiated every action
-	private int potSize, numBoardCards, numLastActions, numLegalActions;
-	private Card[] board;
-	private Action[] lastActions, legalActions;
+	private int potSize, numBoardCards, numLastActions, numLegalActions; //brain
+	private Card[] board; //brain
+	private Action[] lastActions, legalActions; //brain
 	
 	public Player(PrintWriter output, BufferedReader input) {
 		this.outStream = output;
