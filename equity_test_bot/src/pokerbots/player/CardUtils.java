@@ -50,4 +50,22 @@ public class CardUtils {
 			a[i].print();
 		System.out.println();
 	}
+	static String cardToString(Card c) {
+		String ret = "";
+		switch (c.val) {
+			case 14: ret = "A"; break;
+			case 13: ret = "K"; break;
+			case 12: ret = "Q"; break;
+			case 11: ret = "J"; break;
+			case 10: ret = "T"; break;
+			default: ret = "" + c.val;
+		}
+		switch (c.suit) {
+			case 0: ret += "h"; break;
+			case 1: ret += "d"; break;
+			case 2: ret += "s"; break;
+			case 3: ret += "c"; break;
+		}
+		return ret;
+	}
 }

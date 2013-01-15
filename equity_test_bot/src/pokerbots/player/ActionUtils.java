@@ -33,4 +33,17 @@ public class ActionUtils {
 		
 		return pa;
 	}
+	
+	//assumes you are giving a PerformedAction in the correct format for
+	//responding to a getaction packet
+	public static String performedActionToString(PerformedAction pa) {
+		if ("BET".equalsIgnoreCase(pa.getType()) 
+				|| "RAISE".equalsIgnoreCase(pa.getType())) {
+			return pa.getType() + ":" + pa.getAmount();
+		} else if ("DISCARD".equalsIgnoreCase(pa.getType())) {
+			return pa.getType() + ":" + CardUtils.cardToString(pa.getDiscard());
+		} else {
+			return pa.getType();
+		}
+	}
 }
