@@ -12,9 +12,48 @@ public class Brain {
 	public Action[] lastActions, legalActions; //brain
 	public double timebank;
 	
-	Brain() {
-		//pass
+	private Historian maj;
+	private Dory dory;
+	
+	private EquityCalculator ec;
+	
+	Brain(Historian maj) {
+		this.maj = maj;
+		dory = new Dory();
+		ec = new EquityCalculator(hand, null);
 	}
 	
+	Action act() {
+		ec.setBoard(board);
+		maj.update(this);
+		dory.update(this);
+		
+		if(board[2] == null) 
+			return actPreFlop();
+		
+		else if(board[3] == null) 
+			return actPostFlop();
+		
+		else if(board[4] == null) 
+			return actPostTurn();
+		
+		else
+			return actPostRiver();
+	}
 	
+	Action actPreFlop() {
+		
+	}
+	
+	Action actPostFlop() {
+		double equity = ec.calculateTotalEquity();
+	}
+	
+	Action actPostTurn() {
+		double equity = ec.calculateTotalEquity();
+	}
+	
+	Action actPostRiver() {
+		double equity = ec.calculateTotalEquity();
+	}
 }

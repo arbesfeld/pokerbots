@@ -12,5 +12,7 @@ public class Historian {
 		this.bb = bb;
 	}
 	
-	
+	void update(Brain brain) {
+		
+	}
 }

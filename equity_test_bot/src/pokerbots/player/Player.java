@@ -11,9 +11,9 @@ public class Player {
 	
 	private double timeBank; //keep in player
 	
-	Brain brain;
-	Historian maj;
-
+	private Brain brain;
+	private Historian maj;
+	
 	public Player(PrintWriter output, BufferedReader input) {
 		this.outStream = output;
 		this.inStream = input;
@@ -69,7 +69,8 @@ public class Player {
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
-			brain = new Brain();
+			brain = new Brain(maj);
+			
 			brain.handId = Integer.parseInt(tokens[1]);
 			brain.button = Boolean.parseBoolean(tokens[2]);
 			
