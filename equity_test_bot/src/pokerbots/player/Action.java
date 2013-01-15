@@ -1,21 +1,18 @@
 package pokerbots.player;
 
 public class Action {
-	String type;
 	
-	//Our actions:
-	int minBet, maxBet;     //BET
-	int minRaise, maxRaise; //RAISE
-							//CALL
-							//FOLD
-							//DISCARD
+	private String myType;
 	
-	//Performed actions:
-	int betAmount; String actor; //BET
-								 //CALL
-								 //CHECK
-	String street; 				 //DEAL
-	String card; 				 //DISCARD
-								 //FOLD
+	public Action(String t) {
+		myType = t;
+	}
 	
+	public String getType() {
+		return myType;
+	}
+	
+	public void processAction() { //might need to change return type
+		// overridden in child classes
+	}
 }

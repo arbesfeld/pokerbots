@@ -100,12 +100,12 @@ public class Player {
 			brain.numLastActions = Integer.parseInt(tokens[i]);
 			int j = i+1;
 			for( ; j < brain.numLastActions + i; j++) 
-				brain.lastActions[j - i] = ActionUtils.getActionByString(tokens[j]);
+				brain.lastActions[j - i] = ActionUtils.getPerformedActionByString(tokens[j]);
 			
 			brain.numLegalActions = Integer.parseInt(tokens[j]);
 			int k = j+1;
 			for( ; k < brain.numLegalActions + j; k++)
-				brain.legalActions[k - j] = ActionUtils.getActionByString(tokens[k]);
+				brain.legalActions[k - j] = ActionUtils.getLegalActionByString(tokens[k]);
 			
 			timeBank = Integer.parseInt(tokens[k]);
 			
