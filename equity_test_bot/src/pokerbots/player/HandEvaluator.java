@@ -25,12 +25,12 @@ public class HandEvaluator {
 	    valFreq = new int[15];
 		Arrays.fill(valFreq, 0);
 		
-		for(int i = 0; i < 2; i++) { 
+		for(int i = 0; i < h.length; i++) { 
 			valFreq[hand[i].val]++;
 			if(hand[i].val == 14)
 				valFreq[1] = 1;
 		}
-		for(int i = 0; i < 5; i++) { 
+		for(int i = 0; i < b.length; i++) { 
 			valFreq[board[i].val]++;
 			if(board[i].val == 14)
 				valFreq[1] = 1;
@@ -92,7 +92,7 @@ public class HandEvaluator {
 			
 	}
 	
-	//straight with suit of suit
+	//we know it's a straight and a flush, is it a straightFlush with a suit of suit?
 	private static int straightFlush(int suit) {
 		int[] straightFlushFreq = new int[15];
 		Arrays.fill(straightFlushFreq, 0);
@@ -133,7 +133,6 @@ public class HandEvaluator {
 			suitFreq[hand[i].suit]++;
 		for(int i = 0; i < 5; i++) 
 			suitFreq[board[i].suit]++;
-		
 		
 		if(suitFreq[0] >= 5)
 			return 0;

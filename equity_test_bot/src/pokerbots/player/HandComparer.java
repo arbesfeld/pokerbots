@@ -1,27 +1,33 @@
 package pokerbots.player;
 
-//hand is 3 card hand, opponentHand is 2 card hand, board is 5 cards
+//hand is 2 card hand, opponentHand is 2 card hand, board is 5 cards
 public class HandComparer {
-	//returns true if hand1 is stronger or "equal" to hand2, false otherwise
+	//returns true if hand is stronger or "equal" to opponentHand, false otherwise
 	public static boolean compareHands(Card[] hand, Card[] opponentHand, Card[] board) {
-		//tries every possible discard and choose the best one--
-		//not ideal but very close approximation
 		HandRank rank1 = HandEvaluator.getHandRank(new Card[]{hand[0], hand[1]}, board);
-		HandRank rank2 = HandEvaluator.getHandRank(new Card[]{hand[0], hand[2]}, board);
-		HandRank rank3 = HandEvaluator.getHandRank(new Card[]{hand[1], hand[2]}, board);
-		
 		HandRank rankOpponent = HandEvaluator.getHandRank(opponentHand, board);
 		
-		int rank1compare = rank1.compareTo(rankOpponent);
-		int rank2compare = rank2.compareTo(rankOpponent);
-		int rank3compare = rank3.compareTo(rankOpponent);
-		
-		//our hand is outright better
-		if(rank1compare > 0 || rank2compare > 0 || rank3compare > 0)
+		//our hand is better or equal
+		if(rank1.compareTo(rankOpponent) >= 0)
 			return true;
 		else
 			return false;
 		
 	}
 	
+	public static boolean compareHands3CardHand(Card[] hand, Card[] opponentHand, Card[] board) {
+		HandRank rank1 = HandEvaluator.getHandRank(new Card[]{hand[0], hand[1]}, board);
+		HandRank rank2 = HandEvaluator.getHandRank(new Card[]{hand[0], hand[2]}, board);
+		HandRank rank3 = HandEvaluator.getHandRank(new Card[]{hand[1], hand[2]}, board);
+		
+		HandRank rankOpponent = HandEvaluator.getHandRank(opponentHand, board);
+		
+		//our hand is better or equal
+		if(rank1.compareTo(rankOpponent) > 0 || rank2.compareTo(rankOpponent) > 0 ||
+				rank3.compareTo(rankOpponent) > 0)
+			return true;
+		else
+			return false;
+				
+	}
 }
