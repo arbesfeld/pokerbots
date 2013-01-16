@@ -52,7 +52,8 @@ public class EquityCalculator {
 		
 		//pre-flop
 		if(board == null) {
-			return equityPreFlop();
+			return equityPreFlopApprox();
+			//return equityPreFlop();
 		}
 		//post-flop
 		else if(board[3] == null) {
@@ -66,6 +67,10 @@ public class EquityCalculator {
 		else {
 			return equityPostRiver();
 		}
+	}
+	
+	private double equityPreFlopApprox() {
+		return EquityUtils.getEquityThreeCardHand(hand);
 	}
 	
 	//very very slow

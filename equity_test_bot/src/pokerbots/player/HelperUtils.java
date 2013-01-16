@@ -30,4 +30,19 @@ public class HelperUtils {
         c = a[i]; a[i] = a[j]; a[j] = c;
     }
 
+    //linear interpolation of val from range inLo inHi to range outLo outHi
+    public static int linInterp(double val, double inLo, double inHi, double outLo, double outHi) {
+    	val -= inLo;
+    	inHi -= inLo;
+    	outHi -= outLo;
+    	
+    	double ratio = val / inHi;
+    	
+    	return (int)(outLo + ratio * outHi);
+    }
+    
+    //return min if val < min and max if val > max
+    public static int minMax(double val, int min, int max) {
+    	return (int)Math.max(Math.min(val, max), min);
+    }
 }

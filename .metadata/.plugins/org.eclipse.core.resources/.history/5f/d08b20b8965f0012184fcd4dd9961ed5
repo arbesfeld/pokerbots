@@ -1,0 +1,20 @@
+package pokerbots.player;
+
+import java.util.*;
+public class Dory {
+	ArrayList<Integer>[] raiseHistory = new ArrayList[4];
+	
+	Dory() {
+		raiseNumThisStreet = 0;
+	}
+	
+	void update(Brain brain) {
+		switch(brain.lastAction.getType()) {
+		case "RAISE":
+			raiseNumThisStreet++;
+			break;
+		case "DEAL":
+			raiseNumThisStreet = 0;
+		}
+	}
+}

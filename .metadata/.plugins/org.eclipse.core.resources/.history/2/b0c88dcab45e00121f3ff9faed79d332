@@ -1,0 +1,50 @@
+package pokerbots.player;
+
+public class Brain {
+	//instantiated every hand
+	public int handId, myBank, oppBank;
+	public boolean button;
+	public Card[] hand;
+	
+	//instantiated every action
+	public int potSize, numBoardCards, numLastActions, numLegalActions; //brain
+	public Card[] board; //brain
+	public Action[] lastActions, legalActions; //brain
+	public double timebank;
+	
+	private EquityCalculator ec;
+	
+	Brain() {
+		ec = new EquityCalculator(hand, null);
+	}
+	
+	Action act() {
+		if(board[2] == null) 
+			return actPreFlop();
+		
+		else if(board[3] == null) 
+			return actPostFlop();
+		
+		else if(board[4] == null) 
+			return actPostTurn();
+		
+		else
+			return actPostRiver();
+	}
+	
+	Action actPreFlop() {
+		
+	}
+	
+	Action actPostFlop() {
+		
+	}
+	
+	Action actPostTurn() {
+		
+	}
+	
+	Action actPostRiver() {
+		
+	}
+}

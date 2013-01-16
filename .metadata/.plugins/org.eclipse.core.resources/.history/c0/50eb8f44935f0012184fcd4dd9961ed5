@@ -1,0 +1,14 @@
+package pokerbots.player;
+
+public class Dory {
+	int didRaise;
+	
+	Dory() {
+		didRaise = 0;
+	}
+	
+	void update(Brain brain) {
+		if(brain.lastAction.getType() == "RAISE")
+			didRaise++;
+	}
+}

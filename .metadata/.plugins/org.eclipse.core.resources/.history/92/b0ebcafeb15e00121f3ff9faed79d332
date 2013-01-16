@@ -1,0 +1,16 @@
+package pokerbots.player;
+
+public class Brain {
+	//instantiated every hand
+	private int handId, myBank, oppBank;
+	private boolean button;
+	private Card[] hand, brain;
+	
+	//instantiated every action
+	private int potSize, numBoardCards, numLastActions, numLegalActions; //brain
+	private Action[] lastActions, legalActions; //brain
+	
+	Brain(int handId, int myBank, int oppBank, boolean button, Card[] hand, Card[] brain) {
+		
+	}
+}

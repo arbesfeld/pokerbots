@@ -20,7 +20,7 @@ public class LegalAction extends Action {
 		return max;
 	}
 	
-	public int getSmall() {
+	public int getMin() {
 		return min;
 	}
 	

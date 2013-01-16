@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Player {
-	
 	private final PrintWriter outStream;
 	private final BufferedReader inStream;
 	
@@ -109,7 +108,7 @@ public class Player {
 			
 			timeBank = Integer.parseInt(tokens[k]);
 			
-			brain.act();
+			//brain.act();
 		}
 		
 		else if ("HANDOVER".compareToIgnoreCase(word) == 0) {

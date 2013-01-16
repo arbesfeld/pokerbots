@@ -46,4 +46,30 @@ public class ActionUtils {
 			return pa.getType();
 		}
 	}
+	
+	public static Action bet(int amount) {
+		PerformedAction pa =  new PerformedAction("BET");
+		pa.setAmount(amount);
+		return pa;
+	}
+	
+	public static Action call() {
+		return new PerformedAction("CALL");
+	}
+	
+	public static Action check() {
+		return new PerformedAction("CHECK");
+	}
+	
+	public static Action fold() {
+		return new PerformedAction("CHECK");
+	}
+	
+	public static Action raise(int amount) {
+		PerformedAction pa =  new PerformedAction("RAISE");
+		pa.setAmount(amount);
+		return pa;
+	}
+	
+	
 }
