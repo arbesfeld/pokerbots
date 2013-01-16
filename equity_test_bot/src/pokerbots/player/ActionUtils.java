@@ -62,7 +62,7 @@ public class ActionUtils {
 	}
 	
 	public static Action fold() {
-		return new PerformedAction("CHECK");
+		return new PerformedAction("FOLD");
 	}
 	
 	public static Action raise(int amount) {
