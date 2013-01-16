@@ -57,11 +57,11 @@ public class EquityCalculator {
 		}
 		//post-flop
 		else if(board[3] == null) {
-			return equityPostFlop();
+			return equityPostFlop(0);
 		}
 		//post-turn
 		else if(board[4] == null) {
-			return equityPostTurn();
+			return equityPostTurn(0);
 		}
 		//post-river
 		else {
@@ -98,7 +98,7 @@ public class EquityCalculator {
 					board[2] = cardByID[k];
 					usedCards[k] = true;
 					
-					equityPostFlop();
+					equityPostFlop(i+1);
 					
 					usedCards[k] = false;
 				}
@@ -110,17 +110,17 @@ public class EquityCalculator {
 		return getEquity();
 	}
 	
-	private double equityPostFlop() {
+	private double equityPostFlop(int start) {
 		board[3] = new Card(-1, -1); //placeholder
 		
-		for(int i = 0; i < cardCount; i += skip) {
+		for(int i = start; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
 			
 			board[3] = cardByID[i];
 			usedCards[i] = true;
 			
-			equityPostTurn();
+			equityPostTurn(i+1);
 			
 			usedCards[i] = false;
 		}
@@ -128,10 +128,10 @@ public class EquityCalculator {
 		return getEquity();
 	}
 	
-	private double equityPostTurn() {
+	private double equityPostTurn(int start) {
 		board[4] = new Card(-1, -1); //placeholder
 		
-		for(int i = 0; i < cardCount; i += skip) {
+		for(int i = start; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
 		

@@ -22,21 +22,16 @@ public class Dory {
 	
 	void update() {
 		if(brain.lastAction.getActor() == null || 
-				brain.lastAction.getActor() == maj.myName) 
-		switch(brain.lastAction.getType()) {
-		case "RAISE":
+				brain.lastAction.getActor() == maj.myName)
+			return;
+		if(brain.lastAction.getType().equalsIgnoreCase("RAISE")) 
 			raiseAction();
-			break;
-		case "CALL":
+		else if(brain.lastAction.getType().equalsIgnoreCase("CALL"))
 			callAction();
-			break;
-		case "CHECK":
+		else if(brain.lastAction.getType().equalsIgnoreCase("CHECK"))
 			checkAction();
-			break;
-		case "STREET":
+		else if(brain.lastAction.getType().equalsIgnoreCase("STREET"))
 			streetAction();
-			break;
-		}
 	}
 	
 	void raiseAction() {
