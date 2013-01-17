@@ -6,4 +6,5 @@
 */bin1/
 *.dump
 match*.txt
-.metdata/
+.metadata/
+*/.metdata/
