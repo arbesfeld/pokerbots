@@ -18,7 +18,7 @@ public class Brain {
 	public double timebank;
 	
 	private double equity;
-	private boolean canCheck, canDiscard;
+	private boolean canCheck, canBet, canRaise, canDiscard, canCall;
 	
 	private Historian maj;
 	private Dory dory;
@@ -27,58 +27,82 @@ public class Brain {
 	
 	Brain(Historian maj) {
 		this.maj = maj;
-		
-		
 		dory = new Dory(this, maj);	
 	}
 	
-//	public Action act() {
-//		
-//		lastAction = lastActions[lastActions.length - 1];
-//		
-//		for(LegalAction legalAction : legalActions) {
-//			if(legalAction.getType().equalsIgnoreCase("RAISE")) {
-//				raiseAction = legalAction;
-//			}
-//			else if(legalAction.getType().equalsIgnoreCase("BET")) {
-//				betAction = legalAction;
-//			}
-//			else if(legalAction.getType().equalsIgnoreCase("CHECK")) {
-//				canCheck = true;
-//			}
-//			else if(legalAction.getType().equalsIgnoreCase("DISCARD")) {
-//				canDiscard = true;
-//			}
-//		}
-//		
-//		if(lastAction.getType().equalsIgnoreCase("DEAL")) {
-//			ec.setBoard(board);
-//			equity = ec.calculateTotalEquity();
-//		}
-//		
-//		maj.update(this);
-//		dory.update();
-//		
-//		if(board[2] == null) 
-//			return actPreFlop();
-//		
-//		else if(board[3] == null)  {
-//			return actPostFlop();
-//		}
-//		
-//		else if(board[4] == null) 
-//			return actPostTurn();
-//		
-//		else
-//			return actPostRiver();
-//	}
+	public Action act() {
+		
+		lastAction = lastActions[lastActions.length - 1];
+		
+		for(LegalAction legalAction : legalActions) {
+			if(legalAction.getType().equalsIgnoreCase("RAISE")) {
+				raiseAction = legalAction;
+				canRaise = true;
+			}
+			else if(legalAction.getType().equalsIgnoreCase("BET")) {
+				betAction = legalAction;
+				canBet = true;
+			}
+			else if(legalAction.getType().equalsIgnoreCase("CHECK")) {
+				canCheck = true;
+			}
+			else if(legalAction.getType().equalsIgnoreCase("CALL")) {
+				canCall = true;
+			}
+			else if(legalAction.getType().equalsIgnoreCase("DISCARD")) {
+				canDiscard = true;
+			}
+		}
+		
+		if(lastAction.getType().equalsIgnoreCase("DEAL")) {
+			ec.setBoard(board);
+			equity = ec.calculateTotalEquity();
+		}
+		
+		maj.update(this);
+		dory.update();
+		
+		if(board[2] == null) 
+			return actPreFlop();
+		
+		else if(board[3] == null)  {
+			return actPostFlop();
+		}
+		
+		else if(board[4] == null) 
+			return actPostTurn();
+		
+		else
+			return actPostRiver();
+	}
 	
-//	private Action discardCard() {
-//		
-//	}
+	private Action discardCard() {
+		//assumes you have a three card hand
+		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board);
+		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board);
+		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board);
+		double equity0 = ec0.calculateTotalEquity();
+		double equity1 = ec1.calculateTotalEquity();
+		double equity2 = ec2.calculateTotalEquity();
+		
+		equity = Math.max(Math.max(equity0, equity1), equity2);
+		
+		if(equity0 > equity1) {
+			if(equity0 > equity2)
+				return ActionUtils.discard(hand[0]);
+			else
+				return ActionUtils.discard(hand[2]);
+		}
+		else {
+			if(equity1 > equity2) 
+				return ActionUtils.discard(hand[1]);
+			else
+				return ActionUtils.discard(hand[2]);
+		}
+	}
 	
 	private Action actPreFlop() {
-		return button ? actPreFlopButton() : actPreFlopNoButton();
+		return button ? actPreFlopButton() : actPreFlopNotButton();
 	}
 	
 	private Action actPreFlopButton() { //small blind acts first
@@ -98,20 +122,20 @@ public class Brain {
 			if(dory.hasOpponentRaised())
 				return fold();
 			else
-				return raise(HelperUtils.linInterp(equity, 0.55, 0.6, maj.stackSize / 16, maj.stackSize / 8));
+				return putLin(equity, 0.55, 0.6, maj.stackSize / 16, maj.stackSize / 8);
 		}
 		else if(equity < 0.7) {
 			if(dory.hasOpponentRaised())
 				return call();
 			else
-				return raise(HelperUtils.linInterp(equity, 0.6, 0.7, maj.stackSize / 8, maj.stackSize / 4));
+				return putLin(equity, 0.6, 0.7, maj.stackSize / 8, maj.stackSize / 4);
 		}
 		else {
 			return putAllinMinusOne();
 		}
 	}
 	
-	private Action actPreFlopNoButton() { //big blind acts second
+	private Action actPreFlopNotButton() { //big blind acts second
 		if(equity < 0.5 && maj.getPFR() < (1.0 - equity)) {
 			return checkFold();
 		}
@@ -123,11 +147,11 @@ public class Brain {
 				return call();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.5) {
-				return raisePotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
+				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
 						0.5, 1.0 ); 
 			}
 			else {
-				return raisePotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
+				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
 						1.0, 1.5 ); 
 			}
 		}
@@ -139,11 +163,11 @@ public class Brain {
 				return call();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.66) {
-				return raisePotPercentage( equity, maj.getPFR(), (1.0 - equity) * 1.66, 
+				return putPotPercentage( equity, maj.getPFR(), (1.0 - equity) * 1.66, 
 						0.75, 1.25 ); 
 			}
 			else {
-				return raisePotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.66, 
+				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.66, 
 						1.25, 1.75 ); 
 			}
 		}
@@ -153,32 +177,57 @@ public class Brain {
 	}
 	
 	////////////////////////////////////////////////////
-//	private Action actPostFlop() {
-//		
-//	}
-//	
-//	
-//	////////////////////////////////////////////////////
-//	private Action actPostTurn() {
-//		
-//	}
-//	
-//	////////////////////////////////////////////////////
-//	private Action actPostRiver() {
-//		
-//	}
-//	
+	private Action actPostFlop() {
+		return button ? actPostFlopButton() : actPostFlopNotButton();
+	}
+	
+	private Action actPostFlopButton() {    //acts second
+		
+	}
+	
+	private Action actPostFlopNotButton() { //acts first
+		
+	}
+	
+	////////////////////////////////////////////////////
+	private Action actPostTurn() {
+		
+	}
+	private Action actPostTurnButton() {    //acts second
+		
+	}
+	private Action actPostTurnNotButton() { //acts first
+		
+	}
+	
+	////////////////////////////////////////////////////
+	private Action actPostRiver() {
+		
+	}
+	private Action actPostRiverButton() {    //acts second
+			 
+	}
+	private Action actPostRiverNotButton() { //acts first
+		
+	}
+	
 	
 	////////////////////////////////////////////////////
 	// Return various actions
 	////////////////////////////////////////////////////
 	
 	private Action call() {
-		return ActionUtils.call();
+		if(!canCall)
+			return putMin();
+		else
+			return ActionUtils.call();
 	}
 	
 	private Action check() {
-		return ActionUtils.check();
+		if(!canCheck)
+			return fold();
+		else
+			return ActionUtils.check();
 	}
 	
 	private Action fold() {
@@ -189,44 +238,103 @@ public class Brain {
 	///////RAISING/BETTING (whichever is allowed)
 	//////////////////////
 	private Action put(int amount) {
-		return ActionUtils.raise(amount);
+		if(canRaise)
+			return raise(amount);
+		else if(canBet)
+			return bet(amount);
+		else
+			return fold();
 	}
 	
 	private Action putAllin() {
-		return put(raiseAction.getMax());
+		if(canRaise)
+			return raiseAllin();
+		else if(canBet)
+			return betAllin();
+		else
+			return fold();
 	}
 	
 	private Action putAllinMinusOne() {
-		return raise(HelperUtils.minMax(raiseAction.getMax() - 1, raiseAction.getMin(), raiseAction.getMax()));
+		if(canRaise)
+			return raiseAllinMinusOne();
+		else if(canBet)
+			return betAllinMinusOne();
+		else
+			return fold();
 	}
 	
 	private Action putMin() {
-		return raise(raiseAction.getMin());
+		if(canRaise)
+			return raiseMin();
+		else if(canBet)
+			return betMin();
+		else
+			return fold();
+	}
+
+	private Action putLin(double percent, double inLo, double inHi, double outLo, double outHi) {
+		if(canRaise)
+			return raiseLin(percent, inLo, inHi, outLo, outHi);
+		else if(canBet)
+			return betLin(percent, inLo, inHi, outLo, outHi);
+		else
+			return fold();
 	}
 	
 	private Action putPotPercentage(double percent) {
-		return raise(HelperUtils.minMax(potSize * percent, raiseAction.getMin(), raiseAction.getMax()));
+		if(canRaise)
+			return raisePotPercentage(percent);
+		else if(canBet)
+			return betPotPercentage(percent);
+		else
+			return fold();
 	}
 	
 	private Action putPotPercentage(double percent, double inLo, double inHi, double outLo, double outHi) {
-		double value = HelperUtils.linInterp(percent, inLo, inHi, outLo, outHi);
-		return raisePotPercentage(value);
+		if(canRaise)
+			return raisePotPercentage(percent, inLo, inHi, outLo, outHi);
+		else if(canBet)
+			return betPotPercentage(percent, inLo, inHi, outLo, outHi);
+		else
+			return fold();
 	}
 	
+	
 	private Action putHalfPot() {
-		return raisePotPercentage(0.5);
+		if(canRaise)
+			return raiseHalfPot();
+		else if(canBet)
+			return betHalfPot();
+		else
+			return fold();
 	}
 
 	private Action putPot() {
-		return raisePotPercentage(1.0);
+		if(canRaise)
+			return raisePot();
+		else if(canBet)
+			return betPot();
+		else
+			return fold();
 	}
 	
 	private Action putTwoPot() {
-		return raisePotPercentage(2.0);
+		if(canRaise)
+			return raiseTwoPot();
+		else if(canBet)
+			return betTwoPot();
+		else
+			return fold();
 	}
 	
 	private Action putThreePot() {
-		return raisePotPercentage(3.0);
+		if(canRaise)
+			return raiseThreePot();
+		else if(canBet)
+			return betThreePot();
+		else
+			return fold();
 	}
 	
 	//////////////
@@ -234,7 +342,7 @@ public class Brain {
 	//////////////
 	
 	private Action raise(int amount) {
-		return ActionUtils.raise(amount);
+		return ActionUtils.raise(HelperUtils.minMax(amount, raiseAction.getMin(), raiseAction.getMax()));
 	}
 	
 	private Action raiseAllin() {
@@ -242,15 +350,19 @@ public class Brain {
 	}
 	
 	private Action raiseAllinMinusOne() {
-		return raise(HelperUtils.minMax(raiseAction.getMax() - 1, raiseAction.getMin(), raiseAction.getMax()));
+		return raise(raiseAction.getMax());
 	}
 	
 	private Action raiseMin() {
 		return raise(raiseAction.getMin());
 	}
 	
+	private Action raiseLin(double percent, double inLo, double inHi, double outLo, double outHi) {
+		return raise(HelperUtils.linInterp(percent, inLo, inHi, outLo, outHi));
+	}
+	
 	private Action raisePotPercentage(double percent) {
-		return raise(HelperUtils.minMax(potSize * percent, raiseAction.getMin(), raiseAction.getMax()));
+		return raise( (int) (potSize * percent) );
 	}
 	
 	private Action raisePotPercentage(double percent, double inLo, double inHi, double outLo, double outHi) {
@@ -278,7 +390,7 @@ public class Brain {
 	///////BETTING
 	//////////////
 	private Action bet(int amount) {
-		return ActionUtils.bet(amount);
+		return ActionUtils.bet(HelperUtils.minMax(amount, betAction.getMin(), betAction.getMax()));
 	}
 	
 	private Action betAllin() {
@@ -286,15 +398,19 @@ public class Brain {
 	}
 	
 	private Action betAllinMinusOne() {
-		return raise(HelperUtils.minMax(betAction.getMax() - 1, betAction.getMin(), betAction.getMax()));
+		return bet(betAction.getMax() - 1);
 	}
 	
 	private Action betMin() {
 		return bet(betAction.getMin());
 	}
 	
+	private Action betLin(double percent, double inLo, double inHi, double outLo, double outHi) {
+		return bet(HelperUtils.linInterp(percent, inLo, inHi, outLo, outHi));
+	}
+	
 	private Action betPotPercentage(double percent) {
-		return bet(HelperUtils.minMax(potSize * percent, betAction.getMin(), betAction.getMax()));
+		return bet( (int) (potSize * percent) );
 	}
 	
 	private Action betPotPercentage(double percent, double inLo, double inHi, double outLo, double outHi) {

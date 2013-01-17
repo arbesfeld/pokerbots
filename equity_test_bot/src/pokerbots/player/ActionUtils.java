@@ -70,6 +70,10 @@ public class ActionUtils {
 		pa.setAmount(amount);
 		return pa;
 	}
-	
+	public static Action discard(Card card) {
+		PerformedAction pa =  new PerformedAction("DISCARD");
+		pa.setDiscard(card);
+		return pa;
+	}
 	
 }

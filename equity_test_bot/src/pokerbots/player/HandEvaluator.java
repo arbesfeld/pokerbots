@@ -28,12 +28,12 @@ public class HandEvaluator {
 		for(int i = 0; i < h.length; i++) { 
 			valFreq[hand[i].val]++;
 			if(hand[i].val == 14)
-				valFreq[1] = 1;
+				valFreq[1] = 1; //used for straights
 		}
 		for(int i = 0; i < b.length; i++) { 
 			valFreq[board[i].val]++;
 			if(board[i].val == 14)
-				valFreq[1] = 1;
+				valFreq[1] = 1; //used for straights
 		}
 		
 		//kind[4] is the value of the four of a kind, kind[3] is the value of the three of a kind
@@ -57,23 +57,14 @@ public class HandEvaluator {
 		
 		int flush = flush();
 	    int straight = straight();
-		int straightFlush = -1;
-		int topVal = 0, botVal = 0;
-		if(hand[0].compareTo(hand[1]) > 0) {
-			topVal = hand[0].val;
-			botVal = hand[1].val;
-		}
-		else {
-			topVal = hand[1].val;
-			botVal = hand[0].val;
-		}
+		int topVal = hand[1].val, botVal = hand[0].val; //hand is presorted
 		
-	    if(flush != -1)
-	    	straightFlush = straightFlush(flush);
+//	    if(flush != -1)
+//	    	straightFlush = straightFlush(flush);
 	    
-		if(straightFlush != -1)                       //straight flush
-			return new HandRank(8, straight, 0, 0, 0);
-		else if(kind[4] != 0)                         //four of a kind
+//		if(straightFlush != -1)                       //straight flush
+//			return new HandRank(8, straight, 0, 0, 0);
+		if(kind[4] != 0)                         //four of a kind
 			return new HandRank(7, kind[4], 0, topVal, 0); 
 		else if(kind[3] != 0 && kind[2] != 0)         //full house
 			return new HandRank(6, kind[3], kind[2], 0, 0);

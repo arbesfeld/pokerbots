@@ -4,7 +4,7 @@ package pokerbots.player;
 public class HandComparer {
 	//returns true if hand is stronger or "equal" to opponentHand, false otherwise
 	public static boolean compareHands(Card[] hand, Card[] opponentHand, Card[] board) {
-		HandRank rank1 = HandEvaluator.getHandRank(new Card[]{hand[0], hand[1]}, board);
+		HandRank rank1 = HandEvaluator.getHandRank(hand, board);
 		HandRank rankOpponent = HandEvaluator.getHandRank(opponentHand, board);
 		
 		//our hand is better or equal

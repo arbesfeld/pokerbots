@@ -5,19 +5,26 @@ import java.util.*;
 public class Dory {
 	ArrayList<Integer>[] raiseHistory = new ArrayList[4]; //array of ArrayLists representing the raise history of the opp
 														  //raiseHistory[0] contains all raises of opp preflop, etc
-	int street;
-	Brain brain;
-	Historian maj;
+	public GameState currentState;
+	private Brain brain;
+	private Historian maj;
+	
+	enum GameState {
+		PREFLOP,
+		PRETURN,
+		PRERIVER,
+		POSTRIVER
+	}
 	
 	Dory(Brain brain, Historian maj) {
 		this.brain = brain;
 		this.maj = maj;
+		currentState = GameState.PREFLOP;
 		
 		for(int i = 0; i < 4; i++) {
 			raiseHistory[i] = new ArrayList<Integer>(30);
 		}
 		
-		street = 0;
 	}
 	
 	void update() {
@@ -35,15 +42,15 @@ public class Dory {
 	}
 	
 	void raiseAction() {
-		raiseHistory[street].add(brain.lastAction.getAmount());
+		raiseHistory[currentState.ordinal()].add(brain.lastAction.getAmount());
 	}
 	
 	int lastOpponentRaiseSize() {
-		return raiseHistory[street].get(raiseHistory[street].size() - 1);
+		return raiseHistory[currentState.ordinal()].get(raiseHistory[currentState.ordinal()].size() - 1);
 	}
 	
 	boolean hasOpponentRaised() {
-		return raiseHistory[street].size() > 0;
+		return raiseHistory[currentState.ordinal()].size() > 0;
 	}
 	
 	void callAction() {
@@ -57,13 +64,13 @@ public class Dory {
 	void streetAction() {
 		switch(brain.lastAction.getStreet()) {
 		case "FLOP":
-			street = 1;
+			currentState = GameState.PRETURN;
 			break;
 		case "TURN":
-			street = 2;
+			currentState = GameState.PRERIVER;
 			break;
 		case "RIVER":
-			street = 3;
+			currentState = GameState.POSTRIVER;
 			break;
 		}
 	}

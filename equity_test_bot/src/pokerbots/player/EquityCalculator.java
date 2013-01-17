@@ -1,5 +1,7 @@
 package pokerbots.player;
 
+import java.util.*;
+
 public class EquityCalculator {
 	private Card[] cardByID;
 	private Card[] hand; //2 or 3 card hand
@@ -34,6 +36,7 @@ public class EquityCalculator {
 		this.hand = hand;
 		for(int i = 0; i < hand.length; i++) 
 			usedCards[hand[i].id] = true;
+		Arrays.sort(hand);
 	}
 	
 	public void setBoard(Card[] board) {
@@ -111,8 +114,6 @@ public class EquityCalculator {
 	}
 	
 	private double equityPostFlop(int start) {
-		board[3] = new Card(-1, -1); //placeholder
-		
 		for(int i = start; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
@@ -129,8 +130,6 @@ public class EquityCalculator {
 	}
 	
 	private double equityPostTurn(int start) {
-		board[4] = new Card(-1, -1); //placeholder
-		
 		for(int i = start; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
