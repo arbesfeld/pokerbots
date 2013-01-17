@@ -11,6 +11,12 @@ public class PerformedAction extends Action {
 	
 	public PerformedAction(String t) {
 		super(t);
+		actor = null;
+		amount = 0;
+		street = null;
+		discard = null;
+		show1 = null;
+		show2 = null;
 	}
 	
 	public void setActor(String a) {

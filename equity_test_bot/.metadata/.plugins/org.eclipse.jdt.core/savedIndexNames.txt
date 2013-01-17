@@ -1,1 +1,0 @@
-INDEX VERSION 1.126+C:\Users\Matthew\Documents\PokerBots\equity_test_bot\.metadata\.plugins\org.eclipse.jdt.core

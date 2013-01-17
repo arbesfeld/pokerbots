@@ -47,7 +47,7 @@ public class Player {
 		}
 	}
 	
-	private void processInput(String input) {
+	public void processInput(String input) {
 		String[] tokens = input.split(" ");
 		String word = tokens[0];
 		
@@ -68,15 +68,17 @@ public class Player {
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
-			brain = new Brain(maj);
+
+			Card[] hand = new Card[3];
+			hand[0] = CardUtils.getCardByString(tokens[3]);
+			hand[1] = CardUtils.getCardByString(tokens[4]);
+			hand[2] = CardUtils.getCardByString(tokens[5]);
+			
+			brain = new Brain(maj, hand);
 			
 			brain.handId = Integer.parseInt(tokens[1]);
 			brain.button = Boolean.parseBoolean(tokens[2]);
 			
-			brain.hand = new Card[3];
-			brain.hand[0] = CardUtils.getCardByString(tokens[3]);
-			brain.hand[1] = CardUtils.getCardByString(tokens[4]);
-			brain.hand[2] = CardUtils.getCardByString(tokens[5]);
 		
 			brain.board = new Card[5];
 			
@@ -97,21 +99,27 @@ public class Player {
 				brain.board[i - 3] = CardUtils.getCardByString(tokens[i]);
 			
 			brain.numLastActions = Integer.parseInt(tokens[i]);
+			brain.lastActions = new PerformedAction[brain.numLastActions];
 			int j = i+1;
-			for( ; j < brain.numLastActions + i; j++) 
-				brain.lastActions[j - i] = ActionUtils.getPerformedActionByString(tokens[j]);
+			for( ; j < brain.numLastActions + i + 1; j++) {
+				brain.lastActions[j - i - 1] = ActionUtils.getPerformedActionByString(tokens[j]);
+			}
 			
 			brain.numLegalActions = Integer.parseInt(tokens[j]);
+			brain.legalActions = new LegalAction[brain.numLegalActions];
+			
 			int k = j+1;
-			for( ; k < brain.numLegalActions + j; k++)
-				brain.legalActions[k - j] = ActionUtils.getLegalActionByString(tokens[k]);
+			for( ; k < brain.numLegalActions + j+1; k++)
+				brain.legalActions[k - j - 1] = ActionUtils.getLegalActionByString(tokens[k]);
 			
-			timeBank = Integer.parseInt(tokens[k]);
-			
+			timeBank = Double.parseDouble(tokens[k]);
 			//brain.act();
+			outStream.println(ActionUtils.performedActionToString((PerformedAction)brain.act()));
 		}
 		
 		else if ("HANDOVER".compareToIgnoreCase(word) == 0) {
+			brain.myBank = Integer.parseInt(tokens[1]);
+			brain.oppBank = Integer.parseInt(tokens[2]);
 		}
 		
 		else if ("REQUESTKEYVALUES".compareToIgnoreCase(word) == 0) {

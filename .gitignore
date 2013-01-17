@@ -1,6 +1,9 @@
 # This file tells git what to not include in the commit history
 # Don't change this file unless you know what you're doing
 
-/*.sqlite3
+*.db
 */bin/
 */bin1/
+*.dump
+match*.txt
+.metdata/

@@ -4,6 +4,7 @@ public class Brain {
 	//instantiated every hand
 	public int handId, myBank, oppBank;
 	public boolean button;
+	
 	public Card[] hand;
 	
 	//instantiated every action
@@ -12,7 +13,6 @@ public class Brain {
 	public PerformedAction[] lastActions;
 	public LegalAction[] legalActions;
 	
-	public PerformedAction lastAction;
 	public LegalAction raiseAction, betAction;
 
 	public double timebank;
@@ -26,14 +26,14 @@ public class Brain {
 	
 	private EquityCalculator ec;
 	
-	Brain(Historian maj) {
+	Brain(Historian maj, Card[] hand) {
 		this.maj = maj;
 		dory = new Dory(this, maj);	
+		ec = new EquityCalculator(hand, null);
+		this.hand = hand;
 	}
 	
 	public Action act() {
-		
-		lastAction = lastActions[lastActions.length - 1];
 		
 		for(LegalAction legalAction : legalActions) {
 			if(legalAction.getType().equalsIgnoreCase("RAISE")) {
@@ -57,8 +57,8 @@ public class Brain {
 		}
 		
 		for(PerformedAction performedAction : lastActions) {
-			if(performedAction.getType().equalsIgnoreCase("DEAL")) 
-				ec.setBoard(board);{
+			if(performedAction.getType().equalsIgnoreCase("DEAL")) {
+				ec.setBoard(board);
 				if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
 					chooseDiscardCard(); //this will also update equity
 				}
@@ -110,7 +110,7 @@ public class Brain {
 				chosenDiscardCard = hand[2];
 		}
 	}
-
+	
 	private Action discardCard() {
 		return ActionUtils.discard(chosenDiscardCard);
 	}

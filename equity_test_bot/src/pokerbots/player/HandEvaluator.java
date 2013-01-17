@@ -43,7 +43,11 @@ public class HandEvaluator {
 	    
 		for(int i = 14; i >= 2; i--) {
 			if(valFreq[i] > 1) {
-				if(valFreq[i] == 3 && kind[3] != 0)
+				if(valFreq[i] == 4 && kind[4] == 0) 
+					kind[4] = i;
+				else if(valFreq[i] == 3 && kind[3] == 0)
+					kind[3] = i;
+				else if(valFreq[i] == 3 && kind[3] != 0) //full house
 					kind[2] = i;
 				else if(valFreq[i] == 2) {
 					if(kind[2] == 0)
@@ -51,7 +55,7 @@ public class HandEvaluator {
 					else if(kind[2] != 0 && kind[1] == 0)
 						kind[1] = i;
 				}
-				kind[valFreq[i]] = Math.max(kind[valFreq[i]], i);
+				//kind[valFreq[i]] = Math.max(kind[valFreq[i]], i);
 			}
 		}
 		
