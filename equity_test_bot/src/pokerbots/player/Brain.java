@@ -14,12 +14,13 @@ public class Brain {
 	
 	public PerformedAction lastAction;
 	public LegalAction raiseAction, betAction;
-	
+
 	public double timebank;
 	
 	private double equity;
 	private boolean canCheck, canBet, canRaise, canDiscard, canCall;
 	
+	private Card chosenDiscardCard;
 	private Historian maj;
 	private Dory dory;
 	
@@ -51,12 +52,20 @@ public class Brain {
 			}
 			else if(legalAction.getType().equalsIgnoreCase("DISCARD")) {
 				canDiscard = true;
+				return discardCard();
 			}
 		}
 		
-		if(lastAction.getType().equalsIgnoreCase("DEAL")) {
-			ec.setBoard(board);
-			equity = ec.calculateTotalEquity();
+		for(PerformedAction performedAction : lastActions) {
+			if(performedAction.getType().equalsIgnoreCase("DEAL")) 
+				ec.setBoard(board);{
+				if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
+					chooseDiscardCard(); //this will also update equity
+				}
+				else {
+					equity = ec.calculateTotalEquity();
+				}
+			}
 		}
 		
 		maj.update(this);
@@ -76,7 +85,8 @@ public class Brain {
 			return actPostRiver();
 	}
 	
-	private Action discardCard() {
+	//////////////////////////////////////////////
+	private void chooseDiscardCard() {
 		//assumes you have a three card hand
 		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board);
 		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board);
@@ -89,44 +99,49 @@ public class Brain {
 		
 		if(equity0 > equity1) {
 			if(equity0 > equity2)
-				return ActionUtils.discard(hand[0]);
+				chosenDiscardCard = hand[0];
 			else
-				return ActionUtils.discard(hand[2]);
+				chosenDiscardCard = hand[2];
 		}
 		else {
 			if(equity1 > equity2) 
-				return ActionUtils.discard(hand[1]);
+				chosenDiscardCard = hand[1];
 			else
-				return ActionUtils.discard(hand[2]);
+				chosenDiscardCard = hand[2];
 		}
 	}
+
+	private Action discardCard() {
+		return ActionUtils.discard(chosenDiscardCard);
+	}
 	
+	//////////////////////////////////////////
 	private Action actPreFlop() {
 		return button ? actPreFlopButton() : actPreFlopNotButton();
 	}
 	
 	private Action actPreFlopButton() { //small blind acts first
 		if(equity < 0.5) {
-			if(dory.hasOpponentRaised()) { // opponent raised
+			if(dory.hasOpponentRaisedThisStreet()) { // opponent raised
 				if(equity < 0.45 || 
 						dory.lastOpponentRaiseSize() > maj.stackSize / 15)
 					return fold();
 				else // an amount less than 20
-					return call(); 
+					return putMin(); 
 			}
 			else {
 				return call();
 			}
 		}
 		else if(equity < 0.6) { 
-			if(dory.hasOpponentRaised())
+			if(dory.hasOpponentRaisedThisStreet())
 				return fold();
 			else
 				return putLin(equity, 0.55, 0.6, maj.stackSize / 16, maj.stackSize / 8);
 		}
 		else if(equity < 0.7) {
-			if(dory.hasOpponentRaised())
-				return call();
+			if(dory.hasOpponentRaisedThisStreet())
+				return putMin();
 			else
 				return putLin(equity, 0.6, 0.7, maj.stackSize / 8, maj.stackSize / 4);
 		}
@@ -144,7 +159,7 @@ public class Brain {
 				return checkFold();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.25) {
-				return call();
+				return putMin();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.5) {
 				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
@@ -160,15 +175,15 @@ public class Brain {
 				return checkFold();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.33) {
-				return call();
+				return putMin();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.66) {
 				return putPotPercentage( equity, maj.getPFR(), (1.0 - equity) * 1.66, 
-						0.75, 1.25 ); 
+						0.75, 1.25); 
 			}
 			else {
 				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.66, 
-						1.25, 1.75 ); 
+						1.25, 1.75); 
 			}
 		}
 		else {
@@ -182,34 +197,105 @@ public class Brain {
 	}
 	
 	private Action actPostFlopButton() {    //acts second
-		
+		if(equity < 0.45) {
+			return checkFold();
+		}
+		else if(equity < 0.55) {
+			if(dory.hasOpponentCheckedThisStreet()) {
+				if(dory.hasOpponentRaisedThisStreet())  //he checked, I raised, he raised
+					return fold();
+				else
+					return putPotPercentage(equity, 0.45, 0.55, 0.25, 0.5);
+			}
+			else if(dory.opponentBetSizeThisStreet() <= potSize / 10)
+				return putMin();
+			else
+				return fold();
+		}
+		else if(equity < 0.65) {
+			if(dory.hasOpponentCheckedThisStreet()) {
+				return putPotPercentage(equity, 0.55, 0.65, 0.5, 1.0); 
+			}
+			else if(dory.opponentBetSizeThisStreet() <= potSize / 5) {
+				if(dory.hasOpponentRaisedThisStreet()) //he checked, I raised, he raised
+					return fold();
+				else 
+					return putPotPercentage(equity, 0.45, 0.55, 0.25, 0.5);
+			}
+			else if(dory.opponentBetSizeThisStreet() <= potSize / 3)
+				return putMin();
+			else
+				return fold();
+		}
+		else if(equity < 0.75) {
+			if(dory.hasOpponentCheckedThisStreet()) {
+				if(dory.hasOpponentRaisedThisStreet())  //he checked then I raised then he raised
+					return putMin();
+				else
+					return putPotPercentage(equity, 0.65, 0.75, 1.0, 2.0); 
+			}
+			else if(dory.hasOpponentBetThisStreet()) {
+				if(dory.hasOpponentRaisedThisStreet()) //he bet, I raised, he raised
+					return putMin();
+				else 
+					return putPotPercentage(equity, 0.65, 0.75, 0.5, 1.0);
+			}
+			else //should never be executed
+				return putAllinMinusOne();
+		}
+		else 
+			return putAllinMinusOne();
 	}
 	
 	private Action actPostFlopNotButton() { //acts first
-		
+		if(equity < 0.55) {
+			return checkFold();
+		}
+		else if(equity < 0.65) {
+			if(dory.hasOpponentRaisedThisStreet()) {
+				if(dory.lastOpponentRaiseSize() > potSize / 8)
+					return fold();
+				else
+					return call();
+			}
+			else {
+				return putPotPercentage(equity, 0.55, 0.65, 0.25, 0.5);
+			}
+		}
+		else if(equity < 0.75) {
+			if(dory.hasOpponentRaisedThisStreet()) {
+				return call();
+			}
+			else {
+				return putPotPercentage(equity, 0.65, 0.75, 0.5, 1.0);
+			}
+		}
+		else {
+			return putAllinMinusOne();
+		}
 	}
 	
 	////////////////////////////////////////////////////
 	private Action actPostTurn() {
-		
+		return actPostFlop();
 	}
-	private Action actPostTurnButton() {    //acts second
-		
-	}
-	private Action actPostTurnNotButton() { //acts first
-		
-	}
+//	private Action actPostTurnButton() {    //acts second
+//		
+//	}
+//	private Action actPostTurnNotButton() { //acts first
+//		
+//	}
 	
 	////////////////////////////////////////////////////
 	private Action actPostRiver() {
-		
+		return actPostFlop();
 	}
-	private Action actPostRiverButton() {    //acts second
-			 
-	}
-	private Action actPostRiverNotButton() { //acts first
-		
-	}
+//	private Action actPostRiverButton() {    //acts second
+//			 
+//	}
+//	private Action actPostRiverNotButton() { //acts first
+//		
+//	}
 	
 	
 	////////////////////////////////////////////////////

@@ -9,7 +9,6 @@ public class EquityCalculator {
 	private boolean usedCards[]; //usedCards[i] is true if card with id=i is in hand or board
 	private int winningBoards, possibleBoards;
 	private int skip, skip2; //how many cards you should scan "ie. monte carlo method where 1 = all cards"
-	private int offset; //only used if skip is not 1
 	
 	public final int cardCount = 52;
 	EquityCalculator(Card[] hand, Card[] board) {
@@ -79,8 +78,6 @@ public class EquityCalculator {
 	//very very slow
 	private double equityPreFlop() {
 		board = new Card[5];
-		for(int i = 0; i < 3; i++)
-			board[i] = new Card(-1, -1); //placeholder
 		
 		for(int i = 0; i < cardCount; i += skip) {
 			if(usedCards[i])
