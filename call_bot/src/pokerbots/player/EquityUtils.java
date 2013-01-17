@@ -39,7 +39,7 @@ public class EquityUtils {
 	static private double getEquityTwoCardHand(Card card1, Card card2) {
 		int val1 = 14 - card1.val;
 		int val2 = 14 - card2.val;
-		return card1.suit == card2.suit ? suited[val1][val2]/100.0 : unsuited[val1][val2]/100.0;
+		return card1.suit == card2.suit ? suited[val1][val2] : unsuited[val1][val2];
 	}
 	
 	static public double getEquityThreeCardHand(Card[] hand) {
@@ -54,6 +54,6 @@ public class EquityUtils {
 		int r2 = 3;
 		int r3 = 6;
 		
-		return (r1 * handVal[0] + r2 * handVal[1] + r3 * handVal[2]) / (r1 + r2 + r3);
+		return (r1 * handVal[0] + r2 * handVal[1] + r3 * handVal[2]) / (double) (r1 + r2 + r3);
 	}
 }

@@ -36,7 +36,7 @@ DISPLAY_ILLEGAL_ACTIONS = true
 
 # RANDOM: Engine will use its own bot that plays randomly.
 PLAYER_1_TYPE = SOCKET
-   PLAYER_1_NAME = ME
+   PLAYER_1_NAME = P1
 
 PLAYER_2_TYPE = RANDOM
-PLAYER_2_NAME = BOT
+PLAYER_2_NAME = P2
