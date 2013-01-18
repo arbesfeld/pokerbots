@@ -115,16 +115,24 @@ public class Brain {
 		equity = Math.max(Math.max(equity0, equity1), equity2);
 		
 		if(equity0 > equity1) {
-			if(equity0 > equity2)
+			if(equity0 > equity2) {
+				ec = ec0;
 				chosenDiscardCard = hand[0];
-			else
+			}
+			else {
+				ec = ec2;
 				chosenDiscardCard = hand[2];
+			}
 		}
 		else {
-			if(equity1 > equity2) 
+			if(equity1 > equity2)  {
+				ec = ec1;
 				chosenDiscardCard = hand[1];
-			else
+			}
+			else {
 				chosenDiscardCard = hand[2];
+				ec = ec2;
+			}
 		}
 	}
 	
@@ -132,6 +140,8 @@ public class Brain {
 		return ActionUtils.discard(chosenDiscardCard);
 	}
 	
+	//////////////////////////////////////////
+	//THIS IS WHAT WE EDIT
 	//////////////////////////////////////////
 	private Action actPreFlop() {
 		if(maj.stackSize < potSize / 10)
@@ -146,7 +156,7 @@ public class Brain {
 						dory.lastOpponentRaiseSize() > potSize / 4)
 					return fold();
 				else // an amount less than 20
-					return putMin(); 
+					return call(); 
 			}
 			else {
 				return call();
@@ -173,26 +183,26 @@ public class Brain {
 	}
 	
 	private Action actPreFlopNotButton() { //big blind acts second
-		if(equity < 0.4 && maj.getPFR() < (1.0 - equity)) {
+		if(equity < 0.45 && maj.getPFR() < (1.0 - equity)) {
 			return checkFold();
 		}
-		else if(equity < 0.5) {
+		else if(equity < 0.55) {
 			if(maj.getPFR() < 1.0 - equity) {
 				return checkFold();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.25) {
-				return putMin();
+				return call();
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.5) {
 				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
-						0.5, 1.0 ); 
+						0.25, 0.5 ); 
 			}
 			else {
 				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.5, 
-						1.0, 1.5 ); 
+						0.5, 0.75 ); 
 			}
 		}
-		else if(equity < 0.6) {
+		else if(equity < 0.60) {
 			if(maj.getPFR() < 1.0 - equity) {
 				return checkFold();
 			}
@@ -201,11 +211,27 @@ public class Brain {
 			}
 			else if(maj.getPFR() < (1.0 - equity) * 1.66) {
 				return putPotPercentage( equity, maj.getPFR(), (1.0 - equity) * 1.66, 
-						0.75, 1.25); 
+						0.75, 1.0); 
 			}
 			else {
 				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.66, 
-						1.25, 1.75); 
+						1.0, 1.25); 
+			}
+		}
+		else if(equity < 0.65) {
+			if(maj.getPFR() < 1.0 - equity) {
+				return call();
+			}
+			else if(maj.getPFR() < (1.0 - equity) * 1.33) {
+				return putMin();
+			}
+			else if(maj.getPFR() < (1.0 - equity) * 1.66) {
+				return putPotPercentage( equity, maj.getPFR(), (1.0 - equity) * 1.66, 
+						1.25, 1.5); 
+			}
+			else {
+				return putPotPercentage(equity, maj.getPFR(), (1.0 - equity) * 1.66, 
+						1.5, 2.0); 
 			}
 		}
 		else {

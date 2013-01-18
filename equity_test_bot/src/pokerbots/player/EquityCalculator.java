@@ -100,11 +100,14 @@ public class EquityCalculator {
 					
 					equityPostFlop(i+1);
 					
+					board[2] = null;
 					usedCards[k] = false;
 				}
+				board[1] = null;
 				usedCards[j] = false;
 			}
 			
+			board[0] = null;
 			usedCards[i] = false;
 		}
 		return getEquity();
@@ -121,6 +124,7 @@ public class EquityCalculator {
 			equityPostTurn(i+1);
 			
 			usedCards[i] = false;
+			board[3] = null;
 		}
 		
 		return getEquity();
@@ -137,6 +141,7 @@ public class EquityCalculator {
 			equityPostRiver();
 			
 			usedCards[i] = false;
+			board[4] = null;
 		}
 		
 		return getEquity();

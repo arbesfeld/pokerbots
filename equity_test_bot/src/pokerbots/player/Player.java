@@ -113,7 +113,7 @@ public class Player {
 				brain.legalActions[k - j - 1] = ActionUtils.getLegalActionByString(tokens[k]);
 			
 			timeBank = Double.parseDouble(tokens[k]);
-			//brain.act();
+			//String res = ActionUtils.performedActionToString((PerformedAction)brain.act()); System.out.println(res);
 			outStream.println(ActionUtils.performedActionToString((PerformedAction)brain.act()));
 		}
 		

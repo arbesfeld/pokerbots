@@ -8,9 +8,9 @@ public class equity_test_bot {
 	}
 	
 	public static void main(String[] args) {
-		Card h1 = g("Ah");
-		Card h2 = g("Th");
-		Card h3 = g("Qc");
+		Card h1 = g("Ad");
+		Card h2 = g("Qs");
+		Card h3 = g("Js");
 		
 		Card b1 = g("Ad");
 		Card b2 = g("As");
@@ -26,16 +26,16 @@ public class equity_test_bot {
 		//board[2] = b3;
 		//board[3] = b4;
 //		//board[4] = b5;
-		String str1 = "NEWGAME P1 P2 200 2 1000 20.0";
-		String str2 = "NEWHAND 1 true Qc Ah Th 0 0 20.0";
-		String str3 = "GETACTION 3 0 2 POST:1:P1 POST:2:P2 3 CALL FOLD RAISE:2:200 20.0";
-		String str4 = "GETACTION 266 0 2 Raise:66:P1 RAISE:200:P2 2 FOLD CALL 20.0";
-		Player p = new Player(null, null);
-		p.processInput(str1);
-		p.processInput(str2);
-		p.processInput(str3);
-		p.processInput(str4);
-		
+//		String str1 = "NEWGAME P1 P2 200 2 1000 20.0";
+//		String str2 = "NEWHAND 1 true Ad Ac Td 0 0 20.0";
+//		String str3 = "GETACTION 3 0 2 POST:1:P1 POST:2:P2 3 CALL FOLD RAISE:5:200 20.0";
+//		String str4 = "GETACTION 400 3 6d 7s Jh 3 Raise:200:P1 CALL:P1 DEAL:FLOP 1 DISCARD 20.0";
+//		Player p = new Player(null, null);
+//		p.processInput(str1);
+//		p.processInput(str2);
+//		p.processInput(str3);
+//		p.processInput(str4);
+//		
 //		long time1 = System.nanoTime();
 //		
 		EquityCalculator e1 = new EquityCalculator(hand1, null);
