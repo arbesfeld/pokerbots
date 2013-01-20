@@ -8,17 +8,17 @@ public class equity_test_bot {
 	}
 	
 	public static void main(String[] args) {
-		Card h1 = g("2d");
-		Card h2 = g("7d");
+		Card h1 = g("5s");
+		Card h2 = g("Ad");
 		Card h3 = g("9c");
 		
-		Card b1 = g("Ad");
-		Card b2 = g("As");
-		Card b3 = g("2s");
-		Card b4 = g("Qh");
-		Card b5 = g("Qd");
+		Card b1 = g("2d");
+		Card b2 = g("Ks");
+		Card b3 = g("Qs");
+		Card b4 = g("Kh");
+		Card b5 = g("Qc");
 		
-		Card[] hand1 = {h1, h2, h3};
+		Card[] hand1 = {h1, h2};
 		Card[] board = new Card[5];
 
 		board[0] = b1;
