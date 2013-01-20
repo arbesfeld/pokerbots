@@ -21,9 +21,9 @@ public class equity_test_bot {
 		Card[] hand1 = {h1, h2, h3};
 		Card[] board = new Card[5];
 
-		//board[0] = b1;
-		//board[1] = b2;
-		//board[2] = b3;
+		board[0] = b1;
+		board[1] = b2;
+		board[2] = b3;
 		//board[3] = b4;
 //		//board[4] = b5;
 //		String str1 = "NEWGAME P1 P2 200 2 1000 20.0";
@@ -36,15 +36,15 @@ public class equity_test_bot {
 //		p.processInput(str3);
 //		p.processInput(str4);
 //		
-//		long time1 = System.nanoTime();
+		long time1 = System.nanoTime();
 //		
-		EquityCalculator e1 = new EquityCalculator(hand1, null);
+		EquityCalculator e1 = new EquityCalculator(hand1, board);
 		System.out.println("\nEquity hand1 : ");
 		System.out.println(e1.calculateTotalEquity());
 		
-//		long time2 = System.nanoTime();
+		long time2 = System.nanoTime();
 //		
-//		System.out.println("Elapsed time: " + (time2-time1)/Math.pow(10, 9));
+		System.out.println("Elapsed time: " + (time2-time1)/Math.pow(10, 9));
 ////		
 //		System.out.println("\nFast method:");
 //		System.out.println(EquityUtils.getEquityThreeCardHand(hand1));
