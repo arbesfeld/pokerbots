@@ -64,7 +64,7 @@ public class Player {
 		} 
 		
 		else if ("KEYVALUE".compareToIgnoreCase(word) == 0) {
-			//pass
+			maj.notifyValue(tokens[1], tokens[2]); //the key value pair
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
@@ -125,6 +125,8 @@ public class Player {
 		else if ("REQUESTKEYVALUES".compareToIgnoreCase(word) == 0) {
 			// At the end, engine will allow bot to send key/value pairs to store.
 			// FINISH indicates no more to store.
+			outStream.println("DELETE " + maj.oppName);
+			outStream.println("PUT " + maj.oppName + " " + maj.getValueToSave());
 			outStream.println("FINISH");
 		}
 	}

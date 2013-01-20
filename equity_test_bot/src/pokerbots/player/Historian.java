@@ -41,6 +41,19 @@ public class Historian {
 	private int fbCount; // fold to continuation bets
 	private int f2Count; // fold to second barrels
 	
+	// default stats (the "placeholder" values we use when calculating stuff")
+	private double vpip = 0.8;
+	private double pfr = 0.5;
+	private double threeB = 0.3;
+	private double pfrFold = 0.3;
+	private double threeBFold = 0.4;
+	private double wtsd = 0.5;
+	private double cbet = 0.2;
+	private double db = 0.15;
+	private double cbFold = 0.4;
+	private double bFold = 0.4;
+	
+	
 	
 	enum GameState {
 		PREFLOP,
@@ -75,28 +88,28 @@ public class Historian {
 	}
 	
 	public double getVPIP() {
-		double vpip = ((double)(numHandsPlayed - initFoldCount)) / numHandsPlayed;
-		return (25*0.8 + vpip*numHandsPlayed) / (numHandsPlayed + 25);
+		double vpipRate = ((double)(numHandsPlayed - initFoldCount)) / numHandsPlayed;
+		return (25*vpip + vpipRate*numHandsPlayed) / (numHandsPlayed + 25);
 	}
 	
 	public double getPFR() {
-		double pfr = ((double)pfrCount) / numHandsPlayed;
-		return (25*0.5 + pfr*numHandsPlayed) / (numHandsPlayed + 25);
+		double pfrRate = ((double)pfrCount) / numHandsPlayed;
+		return (25*pfr + pfrRate*numHandsPlayed) / (numHandsPlayed + 25);
 	}
 	
 	public double get3BetRate() {
 		double threeBRate = ((double)threeBCount) / numHandsPlayed;
-		return (50*0.3 + threeBRate*numHandsPlayed) / (numHandsPlayed + 50);
+		return (50*threeB + threeBRate*numHandsPlayed) / (numHandsPlayed + 50);
 	}
 	
 	public double getPFRFold() {
 		double pfrFoldR = ((double)pfrFoldCount) / myPFRCount;
-		return (25*0.3 + pfrFoldR*myPFRCount) / (myPFRCount + 25);
+		return (25*pfrFold + pfrFoldR*myPFRCount) / (myPFRCount + 25);
 	}
 	
 	public double get3BetFold() {
 		double rate = ((double)f3Count) / my3BetCount;
-		return (20*0.4 + rate*my3BetCount) / (my3BetCount + 20);
+		return (20*threeBFold + rate*my3BetCount) / (my3BetCount + 20);
 	}
 	
 	public double getAggression() {
@@ -108,27 +121,27 @@ public class Historian {
 	
 	public double getWTSD() {
 		double rate = ((double)showdownCount) / seenFlopCount;
-		return (50*0.5 + rate*seenFlopCount) / (seenFlopCount + 50);
+		return (50*wtsd + rate*seenFlopCount) / (seenFlopCount + 50);
 	}
 	
 	public double getCBet() {
 		double rate = ((double)cbCount) / numHandsPlayed;
-		return (50*0.2 + rate*numHandsPlayed) / (numHandsPlayed + 50);
+		return (50*cbet + rate*numHandsPlayed) / (numHandsPlayed + 50);
 	}
 	
 	public double getDoubleBarrel() {
 		double rate = ((double)twoBCount) / numHandsPlayed;
-		return (50 * 0.15 + rate*numHandsPlayed) / (numHandsPlayed + 50);
+		return (50*db + rate*numHandsPlayed) / (numHandsPlayed + 50);
 	}
 	
 	public double cBetFoldRate() {
 		double rate = ((double)fbCount) / myCBet;
-		return (25*0.4 + rate*myCBet) / (myCBet + 25);
+		return (25*cbFold + rate*myCBet) / (myCBet + 25);
 	}
 	
 	public double barrelFoldRate() {
 		double rate = ((double)f2Count) / myBarrel;
-		return (25*0.4 + rate*myBarrel) / (myBarrel + 25);
+		return (25*bFold + rate*myBarrel) / (myBarrel + 25);
 	}
 	
 	void update(PerformedAction[] lastActions) {
@@ -256,5 +269,13 @@ public class Historian {
 		} else if (pa.getType().equalsIgnoreCase("SHOW")) {
 			showdownCount++;
 		}
+	}
+
+	public String getValueToSave() {
+		return "" + pfr; //save the pfr rate
+	}
+
+	public void notifyValue(String string, String string2) { //key value pair. the key is the opponent name right now
+		pfr = Double.parseDouble(string2);
 	}
 }
