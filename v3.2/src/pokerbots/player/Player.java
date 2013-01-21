@@ -120,6 +120,23 @@ public class Player {
 		else if ("HANDOVER".compareToIgnoreCase(word) == 0) {
 			brain.myBank = Integer.parseInt(tokens[1]);
 			brain.oppBank = Integer.parseInt(tokens[2]);
+			
+			brain.numBoardCards = Integer.parseInt(tokens[3]);
+			int i = 4;
+			for( ; i < brain.numBoardCards + 4; i++)
+				brain.board[i - 4] = CardUtils.getCardByString(tokens[i]);
+			
+			brain.numLastActions = Integer.parseInt(tokens[i]);
+			brain.lastActions = new PerformedAction[brain.numLastActions];
+			int j = i+1;
+			for( ; j < brain.numLastActions + i + 1; j++) {
+				brain.lastActions[j - i - 1] = ActionUtils.getPerformedActionByString(tokens[j]);
+			}
+			
+			
+			maj.update(brain.lastActions);
+			maj.numHandsPlayed++;
+			System.out.println("PFR: " + maj.getPFR());
 		}
 		
 		else if ("REQUESTKEYVALUES".compareToIgnoreCase(word) == 0) {

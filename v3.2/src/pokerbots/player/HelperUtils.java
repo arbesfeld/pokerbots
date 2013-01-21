@@ -45,4 +45,12 @@ public class HelperUtils {
     public static int minMax(double val, int min, int max) {
     	return (int)Math.max(Math.min(val, max), min);
     }
+    
+    public static double logistic(double max1, double max2, double input) {
+    	max1 /= 100;
+    	max2 /= 100;
+    	input /= 100;
+    	double c = 1.0 / Math.exp(-max1 / 2);
+    	return 100 * ( max2 * 2 / (1 + c * Math.exp(-(input + max1 / 2))) - max2 );
+    }
 }

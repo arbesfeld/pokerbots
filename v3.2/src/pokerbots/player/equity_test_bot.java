@@ -9,9 +9,9 @@ public class equity_test_bot  {
 	}
 	
 	public static void main(String[] args) throws IOException{
-		Card h1 = g("2d");
-		Card h2 = g("7d");
-		Card h3 = g("9c");
+		Card h1 = g("9h");
+		Card h2 = g("7h");
+		Card h3 = g("7d");
 		
 		Card b1 = g("Ad");
 		Card b2 = g("As");
@@ -22,9 +22,9 @@ public class equity_test_bot  {
 		Card[] hand1 = {h1, h2, h3};
 		
 		Card[] board = new Card[5];
-		board[0] = b1;
-		board[1] = b2;
-		board[2] = b3;
+//	 	board[0] = b1;
+//		board[1] = b2;
+//		board[2] = b3;
 //		board[3] = b4;
 //		board[4] = b5;
 		
@@ -39,7 +39,7 @@ public class equity_test_bot  {
 //			"GETACTION 3 0 2 POST:1:v2 POST:2:v3 3 CALL FOLD RAISE:4:400 109.95737789799999",
 //			"GETACTION 97 0 2 RAISE:33:v2 RAISE:64:v3 3 FOLD CALL RAISE:95:400 109.95687785999999",
 //			"HANDOVER -433 433 0 3 FOLD:v2 REFUND:31:v3 WIN:66:v3 109.95657583799999",
-//			"NEWHAND 3 false 6s 6d Tc -433 433 109.956576",
+//			"NEWHAND 1 false 6s 6d Tc -433 433 109.956576",
 //			"GETACTION 115 0 3 POST:1:v3 POST:2:v2 RAISE:113:v3 3 FOLD CALL RAISE:224:400 109.95657583799999",
 //			"GETACTION 559 0 2 RAISE:224:v2 RAISE:335:v3 3 FOLD CALL RAISE:400:400 109.956259768",
 //			"GETACTION 800 3 3c 7c 9d 3 RAISE:400:v2 CALL:v3 DEAL:FLOP 1 DISCARD 109.956015557",
@@ -53,7 +53,12 @@ public class equity_test_bot  {
 //		String str3 = "GETACTION 3 0 2 POST:1:P1 POST:2:P2 3 CALL FOLD RAISE:5:200 20.0";
 //		String str4 = "GETACTION 400 3 6d 7s Jh 3 Raise:200:P1 CALL:P1 DEAL:FLOP 1 DISCARD 20.0";
 		
-		BufferedReader input = new BufferedReader(new FileReader("filename.txt"));
+//		Player p = new Player(null, null);
+//		for (String line : str)
+//			p.processInput(line)
+
+		System.out.println(HelperUtils.logistic(400, 400, 400));
+		BufferedReader input = new BufferedReader(new FileReader("v3.2.dump"));
 		Player p = new Player(null, input);
 		p.run();
 		
@@ -63,7 +68,6 @@ public class equity_test_bot  {
 		EquityCalculator e1 = new EquityCalculator(hand1, board);
 		System.out.println("\nEquity hand1 : ");
 		System.out.println(e1.calculateTotalEquity());
-		
 		long time2 = System.nanoTime();
 		
 		System.out.println("Elapsed time: " + (time2-time1)/Math.pow(10, 9));

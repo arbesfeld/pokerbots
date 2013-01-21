@@ -88,12 +88,20 @@ public class Brain {
 		maj.update(this);
 		dory.update();
 		
-		if(equity > 0.65)
+		if(equity > 0.70)
 			return putAllinMinusOne();
-		else if(canCall)
-			return call();
-		else
+		else if(equity > 0.65)
+			return putPotPercentage(equity, 0.65, 0.7, 1.0, 2.0);
+		else if(equity > 0.6)
 			return putMin();
+		else if(equity > 0.55) {
+			if(canCall)
+				return call();
+			else
+				return check();
+		}
+		else
+			return fold();
 //		if(board[2] == null) 
 //			return actPreFlop();
 //		
