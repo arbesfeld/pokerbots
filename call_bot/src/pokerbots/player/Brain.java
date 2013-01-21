@@ -90,8 +90,10 @@ public class Brain {
 		
 		if(canCall)
 			return call();
+		else if(canCheck)
+			return check();
 		else
-			return putMin();
+			return fold();
 //		if(board[2] == null) 
 //			return actPreFlop();
 //		

@@ -12,6 +12,7 @@ public class Dory {
 	double pfCallFactor = 0.2;
 	double aggroFactor = 0.2;
 	double sdwFactor = 0.1;
+	double pfrDivFactor = 4.0;
 	public GameState currentState;
 	private Brain brain;
 	private Historian maj;
@@ -143,7 +144,7 @@ public class Dory {
 			adjustedPFR = PFR;
 		//if(currentState == GameState.PREFLOP) { 
 			changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
-					((adjustedPFR - 0.5) / 4 + 0.5) / theirRaiseHistory[currentState.ordinal()].size();
+					((adjustedPFR - 0.5) / pfrDivFactor + 0.5) / theirRaiseHistory[currentState.ordinal()].size();
 			// equity -= c * logistic(their raise) / PFR / #of their raises
 		//}
 
@@ -161,7 +162,7 @@ public class Dory {
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
 		changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / 
-				((adjustedPFR - 0.5) / 4 + 0.5);
+				((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 	}
 	
