@@ -64,7 +64,12 @@ public class Player {
 		} 
 		
 		else if ("KEYVALUE".compareToIgnoreCase(word) == 0) {
-			maj.notifyValue(tokens[1], tokens[2]); //the key value pair
+			if(tokens.length < 2)
+				return;
+			String[] smallTokens = tokens[1].split(":");
+			if(smallTokens.length < 2)
+				return;
+			maj.notifyValue(smallTokens[0], smallTokens[1], tokens[2]); //the key value pair
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
@@ -81,6 +86,7 @@ public class Player {
 			
 		
 			brain.board = new Card[5];
+
 			
 			brain.myBank = Integer.parseInt(tokens[6]);
 			brain.oppBank = Integer.parseInt(tokens[7]);
@@ -136,14 +142,18 @@ public class Player {
 			
 			maj.update(brain.lastActions);
 			maj.numHandsPlayed++;
+			System.out.println();
 			System.out.println("PFR: " + maj.getPFR());
+			System.out.println("AGGRO: " + maj.getPostFlopRaise());
+			System.out.println();
 		}
 		
 		else if ("REQUESTKEYVALUES".compareToIgnoreCase(word) == 0) {
 			// At the end, engine will allow bot to send key/value pairs to store.
 			// FINISH indicates no more to store.
 			outStream.println("DELETE " + maj.oppName);
-			outStream.println("PUT " + maj.oppName + " " + maj.getValueToSave());
+			outStream.println("PUT " + maj.oppName + ":PFR " + maj.getValueToSave("PFR"));
+			outStream.println("PUT " + maj.oppName + ":AGGRO " + maj.getValueToSave("AGGRO"));
 			outStream.println("FINISH");
 		}
 	}

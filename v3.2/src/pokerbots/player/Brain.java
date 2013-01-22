@@ -170,11 +170,11 @@ public class Brain {
 		if(eL(1)) {
 			return checkFold();
 		}
-		//else if(eL(2)) {
-		//	return call();
-		//}
+		else if(eL(2)) {
+			return call();
+		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[1], eVals[3], sVals[0], sVals[1]);
+			return putLin(dory.liqEquity(), eVals[2], eVals[3], sVals[0], sVals[1]);
 		}
 		else if(eL(4)) {
 			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
@@ -194,11 +194,11 @@ public class Brain {
 		if(eL(1)) {
 			return checkFold();
 		}
-		//else if(eL(2)) {
-		//	return call();
-		//}
+		else if(eL(2)) {
+			return call();
+		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[1], eVals[3], sVals[0], sVals[1]);
+			return putLin(dory.liqEquity(), eVals[2], eVals[3], sVals[0], sVals[1]);
 		}
 		else if(eL(4)) {
 			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
@@ -226,9 +226,9 @@ public class Brain {
 			return checkFold();
 		}
 		else if(eL(3)) {
-			//return call();
+			return call();
 			//return checkFoldCallPotOdds();
-			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
+			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
 		}
 		else if(eL(4)) {
 			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
@@ -251,9 +251,9 @@ public class Brain {
 			return checkFold();
 		}
 		else if(eL(3)) {
-			//return call();
+			return call();
 			//return checkFoldCallPotOdds();
-			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
+			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
 		}
 		else if(eL(4)) {
 			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);

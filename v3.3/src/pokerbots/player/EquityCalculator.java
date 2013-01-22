@@ -11,12 +11,12 @@ public class EquityCalculator {
 	private int skip, skip2; //how many cards you should scan "ie. monte carlo method where 1 = all cards"
 	
 	public final int cardCount = 52;
-	EquityCalculator(Card[] hand, Card[] board) {
+	EquityCalculator(Card[] hand, Card[] board, int skip) {
 		cardByID =       new Card[cardCount];
 		usedCards =      new boolean[cardCount];
 		winningBoards =  0;
 		possibleBoards = 0;
-		skip =           3;
+		this.skip =      skip;
 		skip2 =          2;
 		
 		for(int i = 0; i < cardCount; i++)
@@ -152,13 +152,13 @@ public class EquityCalculator {
 		
 		//iterate through all possible opponent hands
 		//note that two card opponent hand is an approximation
-		for(int i = 0; i < cardCount; i += skip2) {
+		for(int i = 0; i < cardCount; i += skip) {
 			if(usedCards[i])
 				continue;
 			
 			opponentHand[0] = cardByID[i];
 			
-			for(int j = i+1; j < cardCount; j += skip2) {
+			for(int j = i+1; j < cardCount; j += skip) {
 				if(usedCards[j])
 					continue;
 				
@@ -168,6 +168,68 @@ public class EquityCalculator {
 				
 				if(HandComparer.compareHands(hand, opponentHand, board))
 					winningBoards++;
+			}
+		}
+			
+		return getEquity();
+	}
+	
+	private int totalHands;
+	private long totalValue;
+	
+	private double boardWetness() {
+		boardWetnessPostFlop();
+		return (double)totalValue / totalHands;
+	}
+	private void boardWetnessPostFlop() {
+		for(int i = 0; i < cardCount; i += skip) {
+			if(usedCards[i])
+				continue;
+			
+			board[3] = cardByID[i];
+			usedCards[i] = true;
+			
+			boardWetnessPostTurn(i+1);
+			
+			usedCards[i] = false;
+			board[3] = null;
+		}
+	}
+	private void boardWetnessPostTurn(int start) {
+		for(int i = start; i < cardCount; i += skip) {
+			if(usedCards[i])
+				continue;
+			
+			board[4] = cardByID[i];
+			usedCards[i] = true;
+			
+			boardWetnessPostRiver();
+			
+			usedCards[i] = false;
+			board[4] = null;
+		}
+	}
+	
+	private double boardWetnessPostRiver() {
+		Card[] opponentHand = new Card[2];
+		
+		//iterate through all possible opponent hands
+		//note that two card opponent hand is an approximation
+		for(int i = 0; i < cardCount; i += skip) {
+			if(usedCards[i])
+				continue;
+			
+			opponentHand[0] = cardByID[i];
+			
+			for(int j = i+1; j < cardCount; j += skip) {
+				if(usedCards[j])
+					continue;
+				
+				opponentHand[1] = cardByID[j];
+					
+				totalHands++;
+				totalValue += HandEvaluator.getHandRank(board, opponentHand).val;
+				
 			}
 		}
 			

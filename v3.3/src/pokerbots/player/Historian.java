@@ -8,7 +8,8 @@ public class Historian {
 	private PerformedAction[] lastActions;
 	//hand state variables
 	public GameState currentState;
-	public int roundRaiseCount; // how many raises in this round of betting
+	public int ourRaiseCount; // how many raises in this round of betting
+	public int theirRaiseCount;
 	public boolean preFlopRaiser; // whether or not opponent the initial pre-flop raiser
 	public boolean cBetting; //indicates whether we are cBetting
 	public boolean oppCBetting; //whether opponent c-betted in this hand
@@ -43,6 +44,8 @@ public class Historian {
 	private int fbCount; // fold to continuation bets
 	private int f2Count; // fold to second barrels
 	private int sdwCount;
+	private int postFlopRaise;
+	private int roundCount;
 	
 	// default stats (the "placeholder" values we use when calculating stuff")
 	private double vpip = 0.8;
@@ -55,8 +58,8 @@ public class Historian {
 	private double db = 0.15;
 	private double cbFold = 0.4;
 	private double bFold = 0.4;
-	private double aggression = 1.5;
-	
+	private double aggression = 0.3;
+	private double postflopraise = 0.6;
 	
 	enum GameState {
 		PREFLOP,
@@ -72,9 +75,9 @@ public class Historian {
 		this.bb = bb;
 		this.numHandsPlayed = 0;
 		this.currentState = GameState.PREFLOP;
-		this.roundRaiseCount = 0;
 		
-		roundRaiseCount = 0; // how many raises in this round of betting
+		ourRaiseCount = 0;
+		theirRaiseCount = 0; // how many raises in this round of betting
 		preFlopRaiser = false; // whether or not opponent the initial pre-flop raiser
 		cBetting = false; //indicates whether we are cBetting
 		oppCBetting = false; //whether opponent c-betted in this hand
@@ -112,12 +115,14 @@ public class Historian {
 		fbCount = 0; // fold to continuation bets
 		f2Count = 0; // fold to second barrels
 		sdwCount = 0;
+		roundCount = 0;
 	}
 	
 	
 	public void newHand() {
 		currentState = GameState.PREFLOP;
-		roundRaiseCount = 0;
+		ourRaiseCount = 0;
+		theirRaiseCount = 0;
 		preFlopRaiser = false;
 		cBetting = false;
 		barrelling = false;
@@ -130,15 +135,21 @@ public class Historian {
 		return (25*vpip + vpipRate*numHandsPlayed) / (numHandsPlayed + 25);
 	}
 	
+	public double getPostFlopRaise() {
+		//double postFlopRaiseRate = ((double)postFlopRaise) / Math.max(1, seenFlopCount);
+		//return (50*postflopraise + postFlopRaiseRate*seenFlopCount) / (50 + seenFlopCount);
+		double rate = (double)raiseCount / Math.max(1, roundCount); 
+		return (50*aggression + rate*roundCount) / (50 + roundCount);
+	}
 	public double getPFR() {
 		double pfrRate = ((double)pfrCount) / Math.max(1, (numHandsPlayed-instantFold));
 		//System.out.println("(25*pfr + pfrRate*numHandsPlayed) / (numHandsPlayed + 25): "  + (25*pfr + pfrRate*numHandsPlayed) / (numHandsPlayed + 25));
 		//return 0.5;
-		return (25*pfr + pfrRate*(numHandsPlayed-instantFold)) / ((numHandsPlayed-instantFold) + 25);
+		return (50*pfr + pfrRate*(numHandsPlayed-instantFold)) / ((numHandsPlayed-instantFold) + 50);
 	}
 	
 	public double get3BetRate() {
-		double threeBRate = ((double)threeBCount) / numHandsPlayed;
+		double threeBRate = ((double)threeBCount) / Math.max(1, numHandsPlayed);
 		return (50*threeB + threeBRate*numHandsPlayed) / (numHandsPlayed + 50);
 	}
 	
@@ -153,10 +164,10 @@ public class Historian {
 	}
 	
 	public double getAggression() {
-		double raise = ((double)raiseCount) / actionCount;
-		double bet = ((double)betCount) / actionCount;
-		double call = ((double)callCount) / actionCount;
-		return (50 * aggression + (raise + bet) / call) / (50 + (raise + bet) / call);
+		double raise = ((double)raiseCount) / Math.max(1, actionCount);
+		double bet = ((double)betCount) / Math.max(1, actionCount);
+		double call = Math.max(1.0, ((double)callCount)) / Math.max(1, actionCount);
+		return Math.min(0.7, (100 * aggression + ((raise + bet) / call)*actionCount) / (100 + actionCount));
 	}
 	
 	public double getWTSD() {
@@ -211,27 +222,27 @@ public class Historian {
 		if (pa.getType().equalsIgnoreCase("RAISE")) {
 			if(pa.getAmount() < 11)
 				return;
-			if (roundRaiseCount == 0) {
+			if (theirRaiseCount == 0) {
 				preFlopRaiser = pa.getActor().equalsIgnoreCase(oppName);
 				if (preFlopRaiser) {
 					pfrCount++;
-					roundRaiseCount++;
 				} else {
 					myPFRCount++;
 				}
-			} else {
+			} else if(ourRaiseCount == 1 && theirRaiseCount == 0){
 				if (pa.getActor().equalsIgnoreCase(oppName)) {
 					threeBCount++;
-					roundRaiseCount++;
-				} else {
-					my3BetCount++;
-				}
+				} 
 			}
+			if(pa.getActor().equalsIgnoreCase(oppName))
+				theirRaiseCount++;
+			else
+				ourRaiseCount++;
 		} else if (pa.getType().equalsIgnoreCase("FOLD")) {
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
-				if (roundRaiseCount == 0) {
+				if (theirRaiseCount == 0) {
 					initFoldCount++; //opp didn't play hand
-				} else if (roundRaiseCount == 1) {
+				} else if (theirRaiseCount == 1) {
 					pfrFoldCount++;
 				} else {
 					f3Count++;
@@ -244,11 +255,14 @@ public class Historian {
 		} else if (pa.getType().equalsIgnoreCase("POST")) {
 			if(pa.getActor().equalsIgnoreCase(myName))
 				newHand();
-			roundRaiseCount = 0;
+			theirRaiseCount = 0;
+			ourRaiseCount = 0;
 		} else if (pa.getType().equalsIgnoreCase("DEAL")) {
 			if (pa.getStreet().equalsIgnoreCase("FLOP")) {
 				currentState = GameState.PRETURN;
-				roundRaiseCount = 0;
+				roundCount++;
+				theirRaiseCount = 0;
+				ourRaiseCount = 0;
 				seenFlopCount++;
 			}
 		}
@@ -256,31 +270,19 @@ public class Historian {
 	
 	void processPostFlopAction(PerformedAction pa) {
 		if (pa.getType().equalsIgnoreCase("RAISE")) {
-			roundRaiseCount++;
+			if(pa.getAmount() < 11)
+				return;
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
-				raiseCount++;
-				actionCount++;
-				if (preFlopRaiser && currentState == GameState.PRETURN) {
-					cbCount++;
-					oppCBetting = true;
-				} else if (currentState != GameState.PRETURN && oppCBetting) {
-					twoBCount++;
-				}
-			} else {
-				if (currentState == GameState.PRETURN) {
-					cBetting = !preFlopRaiser; //we are c-betting if we were the pre-flop raiser
-					if (cBetting) {
-						myCBet++;
-					}
-				} else {
-					barrelling = cBetting;
-					if (barrelling) {
-						myBarrel++;
-					}
+				if(theirRaiseCount == 0) {
+					raiseCount++;
+					actionCount++;
+					theirRaiseCount++;
+					postFlopRaise++;
 				}
 			}
 		} else if (pa.getType().equalsIgnoreCase("FOLD")) {
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
+				actionCount++;
 				if (cBetting && currentState == GameState.PRETURN) {
 					fbCount++;
 				} else if (barrelling) {
@@ -288,8 +290,14 @@ public class Historian {
 				}
 			}
 		} else if (pa.getType().equalsIgnoreCase("BET")) {
+			if(pa.getAmount() < 11)
+				return;
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
-				betCount++;
+				if(theirRaiseCount == 0) {
+					theirRaiseCount++;
+					postFlopRaise++;
+					betCount++;
+				}
 				actionCount++;
 				if (currentState == GameState.PRETURN && preFlopRaiser) {
 					cbCount++;
@@ -312,19 +320,21 @@ public class Historian {
 				}
 			} 
 		} else if (pa.getType().equalsIgnoreCase("CALL")) {
-			if (pa.getType().equalsIgnoreCase(oppName)) {
+			if (pa.getActor().equalsIgnoreCase(oppName)) {
 				actionCount++;
 				callCount++;
 			}
 		} else if (pa.getType().equalsIgnoreCase("CHECK")) {
-			
+			if(pa.getActor().equalsIgnoreCase(oppName))
+				actionCount++;
 		} else if (pa.getType().equalsIgnoreCase("DEAL")) {
+			theirRaiseCount = 0;
+			roundCount++;
 			if (pa.getStreet().equalsIgnoreCase("TURN")) {
 				currentState = GameState.PRERIVER;
 			} else if (pa.getStreet().equalsIgnoreCase("RIVER")) {
 				currentState = GameState.POSTRIVER;
 			}
-			roundRaiseCount++;
 		} else if (pa.getType().equalsIgnoreCase("SHOW")) {
 			if(lastActions[lastActions.length - 1].getActor().equalsIgnoreCase(myName))
 				sdwCount++;
@@ -332,12 +342,21 @@ public class Historian {
 		}
 	}
 
-	public String getValueToSave() {
-		return "" + pfr; //save the pfr rate
+	public String getValueToSave(String key) {
+		if(key.equalsIgnoreCase("PFR"))
+			return "" + getPFR(); //save the pfr rate
+		else if(key.equalsIgnoreCase("AGGRO"))
+			return "" + getAggression(); //save the pfr rate
+		else
+			return "";
 	}
 
-	public void notifyValue(String string, String string2) { //key value pair. the key is the opponent name right now
-		if(string.equalsIgnoreCase(oppName))
-			pfr = Double.parseDouble(string2);
+	public void notifyValue(String name, String key, String value) { //key value pair. the key is the opponent name right now
+		if(name.equalsIgnoreCase(oppName)) {
+			if(key.equalsIgnoreCase("PFR"))
+				pfr = Double.parseDouble(value);
+			else if(key.equalsIgnoreCase("AGGRO"))
+				postflopraise = Double.parseDouble(value);
+		}
 	}
 }

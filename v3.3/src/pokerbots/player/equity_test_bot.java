@@ -65,7 +65,7 @@ public class equity_test_bot  {
 	
 		long time1 = System.nanoTime();
 		
-		EquityCalculator e1 = new EquityCalculator(hand1, board);
+		EquityCalculator e1 = new EquityCalculator(hand1, board, 1);
 		System.out.println("\nEquity hand1 : ");
 		System.out.println(e1.calculateTotalEquity());
 		long time2 = System.nanoTime();

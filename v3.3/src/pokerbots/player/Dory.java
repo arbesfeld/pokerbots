@@ -8,17 +8,19 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.00025;
-	double pfCallFactor = 0.2;
-	double aggroFactor = 0.2;
-	double sdwFactor = 0.1;
-	double pfrDivFactor = 4.0;
+	double[] pfRaiseFactor;
+	double[] pfCallFactor;
+	double[] pfCheckFactor;
+	
+	double pfrDivFactor;
+	double aggroDivFactor;
+	double sdwFactor;
 	public GameState currentState;
 	private Brain brain;
 	private Historian maj;
 	
-	public double changeEquity, changeEquityThisStreet;
-	public int myBets, theirBets, myBetsThisStreet, theirBetsThisStreet;
+	public double changeEquity, changeEquityCall;
+	public int myBets, theirBets, myBetsThisStreet, theirBetsThisStreet, numTheirCallChecks;
 	
 	enum GameState {
 		PREFLOP,
@@ -36,6 +38,17 @@ public class Dory {
 		theirBets = 0;
 		myBetsThisStreet = 0;
 		theirBetsThisStreet = 0;
+		numTheirCallChecks = 0;
+		
+		pfRaiseFactor = new double[]{0.00026, 0.00015, 0.00015, 0.00015};
+		pfCheckFactor = new double[]{0.2, 0.1, 0.1, 0.1};
+		pfCallFactor = new double[4];
+		for(int i = 0; i < 4; i++)
+			pfCallFactor[i] = pfCheckFactor[i];
+		
+		pfrDivFactor = 1.0;
+		aggroDivFactor = 1.0;
+		sdwFactor = 0.1;
 		
 		betHistory = new int[4];
 		Arrays.fill(betHistory, 0);
@@ -50,7 +63,7 @@ public class Dory {
 			theirRaiseHistory[i] = new ArrayList<Integer>(30);
 		}
 		
-		changeEquityThisStreet = 0.0;
+		changeEquityCall = 0.0;
 		changeEquity = 0.0;
 	}
 	
@@ -87,7 +100,7 @@ public class Dory {
 				else
 					theirPostAction(performedAction);
 			}
-			else if(performedAction.getType().equalsIgnoreCase("STREET")) {
+			else if(performedAction.getType().equalsIgnoreCase("DEAL")) {
 				streetAction(performedAction);
 			}
 		}
@@ -132,52 +145,159 @@ public class Dory {
 	}
 	
 	private void theirRaiseAction(PerformedAction performedAction) {
-		if(performedAction.getAmount() < 11) {
-			theirBetsThisStreet += performedAction.getAmount();
+		double littleFactor = 1.0;
+		if(performedAction.getAmount() - theirBetsThisStreet < 11)
 			return;
-		}
 
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
+		
 		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
+		double adjustedPFR = (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
+		
+		double aggro = maj.getPostFlopRaise();
+		double adjustedAggro = (0.25 / (1 - aggro) - 0.5) / aggroDivFactor + 0.5;
+		
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
-		//if(currentState == GameState.PREFLOP) { 
-			changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
-					((adjustedPFR - 0.5) / pfrDivFactor + 0.5) / theirRaiseHistory[currentState.ordinal()].size();
-			// equity -= c * logistic(their raise) / PFR / #of their raises
-		//}
-
+		
+		if(aggro > 0.5)
+			adjustedAggro = aggro;
+		
+		if(currentState == GameState.PREFLOP) {
+			changeEquity -= littleFactor * pfRaiseFactor[0] * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
+					adjustedPFR;
+				// equity -= c * logistic(their raise) / PFR / #of their raises
+		}
+		else if (currentState == GameState.PRETURN){
+			changeEquity -= littleFactor * pfRaiseFactor[1] * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
+					adjustedAggro;
+		}
+		else if (currentState == GameState.PRERIVER){
+			changeEquity -= littleFactor * pfRaiseFactor[2] * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
+					adjustedAggro;
+		}
+		else if (currentState == GameState.POSTRIVER){
+			changeEquity -= littleFactor * pfRaiseFactor[3] * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
+					adjustedAggro;
+		}
+		
+		changeEquity -= changeEquityCall;
+		changeEquityCall = 0.0;
+		
 		theirBetsThisStreet += performedAction.getAmount();
 	}
 	
 	private void theirBetAction(PerformedAction performedAction) {
-		theirBetsThisStreet += performedAction.getAmount();
-
-		if(performedAction.getAmount() < 11)
+		double littleFactor = 1.0;
+		if(performedAction.getAmount() - theirBetsThisStreet < 11)
 			return;
 		
 		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
+		double adjustedPFR = (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
+		
+		double aggro = maj.getPostFlopRaise();
+		double adjustedAggro = (0.25 / (1 - aggro) - 0.5) / aggroDivFactor + 0.5;
+		
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
-		changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / 
-				((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
+		
+		if(aggro > 0.5)
+			adjustedAggro = aggro;
+		
+		if(currentState == GameState.PREFLOP) {
+			changeEquity -= littleFactor * pfRaiseFactor[0] * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / adjustedPFR;
+		}
+		else if(currentState == GameState.PRETURN) {
+			changeEquity -= littleFactor * pfRaiseFactor[1] * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / adjustedAggro;
+		}
+		else if(currentState == GameState.PRERIVER) {
+			changeEquity -= littleFactor * pfRaiseFactor[2] * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / adjustedAggro;
+		}
+		else if(currentState == GameState.POSTRIVER) {
+			changeEquity -= littleFactor * pfRaiseFactor[3] * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / adjustedAggro;
+		}
+		
+		changeEquity -= changeEquityCall;
+		changeEquityCall = 0.0;
+
+		theirBetsThisStreet += performedAction.getAmount();
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 	}
 	
 	private void theirCallAction(PerformedAction performedAction) {
-		//if(currentState == GameState.PREFLOP) { 
-		changeEquity += pfCallFactor * maj.getPFR() / 
-				(1.0 + myRaiseHistory[currentState.ordinal()].size() + theirRaiseHistory[currentState.ordinal()].size());
-			// equity += d * pfr / (1 + total number of raises (both players))
-		//}
-				
+		numTheirCallChecks++;
+		int callAmt = myBetsThisStreet - theirBetsThisStreet;
+		
+		if(changeEquityCall > 0)
+			changeEquity -= changeEquityCall;
+		
+		double PFR = maj.getPFR();
+		double adjustedPFR = (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
+		
+		double aggro = maj.getPostFlopRaise();
+		double adjustedAggro = (0.25 / (1 - aggro) - 0.5) / aggroDivFactor + 0.5;
+		
+		if(PFR > 0.5)
+			adjustedPFR = PFR;
+		
+		if(aggro > 0.5)
+			adjustedAggro = aggro;
+		
+		// equity += d * pfr / (1 + total number of raises (both players))
+		if(currentState == GameState.PREFLOP) { 
+			changeEquityCall = pfCallFactor[0] * adjustedPFR / 
+					(1.0 + myRaiseHistory[currentState.ordinal()].size() + theirRaiseHistory[currentState.ordinal()].size()) / numTheirCallChecks;
+		}
+		else if(currentState == GameState.PRETURN){
+			changeEquityCall = pfCallFactor[1] * adjustedAggro / 
+					(1.0 + myRaiseHistory[currentState.ordinal()].size() + theirRaiseHistory[currentState.ordinal()].size()) / numTheirCallChecks;
+		}
+		else if(currentState == GameState.PRERIVER){
+			changeEquityCall = pfCallFactor[2] * adjustedAggro / 
+					(1.0 + myRaiseHistory[currentState.ordinal()].size() + theirRaiseHistory[currentState.ordinal()].size()) / numTheirCallChecks;
+		}
+		else if(currentState == GameState.POSTRIVER){
+			changeEquityCall = pfCallFactor[3] * adjustedAggro / 
+					(1.0 + myRaiseHistory[currentState.ordinal()].size() + theirRaiseHistory[currentState.ordinal()].size()) / numTheirCallChecks;
+			
+		}		
+		
+		changeEquity += changeEquityCall;
 		theirBetsThisStreet = myBetsThisStreet;
 	}
 
 	private void theirCheckAction(PerformedAction performedAction) {
+		numTheirCallChecks++;
 		checkHistory[currentState.ordinal()] = true;
+		
+
+		double PFR = maj.getPFR();
+		double adjustedPFR = (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
+		
+		double aggro = maj.getPostFlopRaise();
+		double adjustedAggro = (0.25 / (1 - aggro) - 0.5) / aggroDivFactor + 0.5;
+		
+		if(PFR > 0.5)
+			adjustedPFR = PFR;
+		
+		if(aggro > 0.5)
+			adjustedAggro = aggro;
+		
+		if(currentState == GameState.PREFLOP) { 
+			changeEquityCall = pfCheckFactor[0] * adjustedPFR / numTheirCallChecks;
+		}
+		else if(currentState == GameState.PRETURN){
+			changeEquityCall = pfCheckFactor[1] * adjustedAggro / numTheirCallChecks;
+		}
+		else if(currentState == GameState.PRERIVER){
+			changeEquityCall = pfCheckFactor[2] * adjustedAggro / numTheirCallChecks;
+		}
+		else if(currentState == GameState.POSTRIVER){
+			changeEquityCall = pfCheckFactor[3] * adjustedAggro / numTheirCallChecks;
+			
+		}
+		
+		changeEquity += changeEquityCall;
 	}
 
 	private void streetAction(PerformedAction performedAction) {
@@ -185,8 +305,7 @@ public class Dory {
 		myBetsThisStreet = 0;
 		theirBets += theirBetsThisStreet;
 		theirBetsThisStreet = 0;
-		changeEquity += changeEquityThisStreet;
-		changeEquityThisStreet = 0.0;
+		changeEquityCall = 0.0;
 		if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
 			currentState = GameState.PRETURN;
 		}
@@ -224,6 +343,6 @@ public class Dory {
 		return (double)amountToPut / (amountToPut + brain.potSize); 
 	}
 	public double liqEquity() {
-		return brain.equity + changeEquity + changeEquityThisStreet;
+		return brain.equity + changeEquity;
 	}
 }

@@ -24,14 +24,19 @@ public class Brain {
 	
 	private Card chosenDiscardCard;
 	private Historian maj;
-	private Dory dory;
-	
+	public Dory dory;
+	private int skip;
 	private EquityCalculator ec;
 	
 	Brain(Historian maj, Card[] hand) {
 		this.maj = maj;
 		dory = new Dory(this, maj);	
-		ec = new EquityCalculator(hand, null);
+		skip = 1;
+		
+		if(timebank < 30)
+			skip = 3;
+		
+		ec = new EquityCalculator(hand, null, skip);
 		this.hand = hand;
 		
 		
@@ -43,7 +48,7 @@ public class Brain {
 		eVals = new double[]{0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8}; 
 		
 		//should range from maj.stackSize / 64 to maj.stackSize, play around with these a lot
-		sVals = new double[]{maj.stackSize / 40.0, maj.stackSize / 20.0, maj.stackSize / 16.0, maj.stackSize / 8.0, maj.stackSize / 6.0, maj.stackSize / 4.0, maj.stackSize / 3.0, maj.stackSize}; 
+		sVals = new double[]{5, 20, 40, 80, 120, 180, 240, 300, 350, 400}; 
 		
 		//should range from 0.05 to 3.0, play around with these a lot
 		pVals = new double[]{0.1, 0.25, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 3.0};
@@ -58,6 +63,9 @@ public class Brain {
 		canDiscard = false;
 	}
 	public Action act() {
+
+		if(timebank < 30)
+			skip = 3;
 		
 		reset();
 
@@ -91,11 +99,9 @@ public class Brain {
 			if(performedAction.getType().equalsIgnoreCase("DEAL")) {
 				ec.setBoard(board);
 				if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
-					ec.setSkip(3);
 					chooseDiscardCard(); //this will also update equity
 				}
 				else {
-					ec.setSkip(1);
 					equity = ec.calculateTotalEquity();
 				}
 			}
@@ -107,8 +113,9 @@ public class Brain {
 		}
 		
 		
-		System.out.println("Liquid equity: " + dory.liqEquity());
-
+		System.out.println("\nLiquid equity: " + dory.liqEquity() );
+		System.out.println("Equity: " + equity + "\n");
+		
 		if(board[2] == null) 
 			return actPreFlop();
 		
@@ -126,13 +133,12 @@ public class Brain {
 	//////////////////////////////////////////////
 	private void chooseDiscardCard() {
 		//assumes you have a three card hand
-		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board);
-		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board);
-		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board);
+		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board, skip);
+		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board, skip);
+		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board, skip);
 		double equity0 = ec0.calculateTotalEquity();
 		double equity1 = ec1.calculateTotalEquity();
 		double equity2 = ec2.calculateTotalEquity();
-		
 		equity = Math.max(Math.max(equity0, equity1), equity2);
 		
 		if(equity0 > equity1) {
@@ -169,14 +175,14 @@ public class Brain {
 	}
 	
 	private Action actPreFlopButton() { //small blind acts first
-		if(eL(1)) {
+		if(eL(0)) {
 			return checkFold();
 		}
-		//else if(eL(2)) {
-		//	return call();
-		//}
+		else if(eL(2)) {
+			return call();
+		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[1], eVals[3], sVals[0], sVals[1]);
+			return putLin(dory.liqEquity(), eVals[2], eVals[3], sVals[0], sVals[1]);
 		}
 		else if(eL(4)) {
 			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
@@ -193,14 +199,15 @@ public class Brain {
 	}
 	
 	private Action actPreFlopNotButton() { //big blind acts second
-		if(eL(1)) {
+		if(eL(0)) {
 			return checkFold();
 		}
-		//else if(eL(2)) {
-		//	return call();
-		//}
+		else if(eL(1)) {
+			return checkFoldCallPotOdds();
+		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[1], eVals[3], sVals[0], sVals[1]);
+			return call();
+			//return putLin(dory.liqEquity(), eVals[1], eVals[3], sVals[0], sVals[1]);
 		}
 		else if(eL(4)) {
 			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
@@ -222,27 +229,30 @@ public class Brain {
 	}
 	
 	private Action actPostFlopButton() {    //acts second
-		if(eL(2)) {
+		if(eL(1)) {
 			if(dory.theirBetsThisStreet - dory.myBetsThisStreet < pV(0))
 				return call();
 			return checkFold();
 		}
-		else if(eL(3)) {
-			//return call();
-			//return checkFoldCallPotOdds();
-			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
+		if(eL(4)) {
+			return checkFoldCallPotOdds();
 		}
 		else if(eL(4)) {
-			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
+			//return call();
+			//return checkFoldCallPotOdds();
+			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[4], pVals[1], pVals[2]);
 		}
 		else if(eL(5)) {
-			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[3], pVals[4]);
+			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[2], pVals[3]);
 		}
 		else if(eL(6)) {
-			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[4], pVals[5]); 
+			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[3], pVals[4]);
+		}
+		else if(eL(7)) {
+			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[4], pVals[5]); 
 		}
 		else {
-			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[5], pVals[6]);
+			return putPotPercentage(dory.liqEquity(), eVals[7], eVals[7], pVals[5], pVals[6]);
 		}
 	}
 	
@@ -252,7 +262,7 @@ public class Brain {
 				return call();
 			return checkFold();
 		}
-		else if(eL(3)) {
+		else if(eL(4)) {
 			//return call();
 			//return checkFoldCallPotOdds();
 			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
