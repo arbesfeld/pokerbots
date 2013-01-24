@@ -35,15 +35,16 @@ public class Match {
 		gameCount = 0;
 		roundCount = new int[4];
 		winCount = new int[4];
-		preFlopEquityHist = new int[10];
-		preFlopEquityWinAmts = new int[10];
-		preFlopEquityWinsHist = new int[10];
-		postFlopEquityHist = new int[10];
-		postFlopEquityWinsHist = new int[10];
-		postFlopEquityWinAmts = new int[10];
-		totalWinsPreEquity = new int[10];
-		totalHandsPreEquity = new int[10];
-		totalAmtPreEquity = new int[10];
+		//histograms divide up 0 - 0.99 in 10 buckets; 1.0 equities are put in the last bucket
+		preFlopEquityHist = new int[11];
+		preFlopEquityWinAmts = new int[11];
+		preFlopEquityWinsHist = new int[11];
+		postFlopEquityHist = new int[11];
+		postFlopEquityWinsHist = new int[11];
+		postFlopEquityWinAmts = new int[11];
+		totalWinsPreEquity = new int[11];
+		totalHandsPreEquity = new int[11];
+		totalAmtPreEquity = new int[11];
 		pfrCount = 0;
 	}
 	

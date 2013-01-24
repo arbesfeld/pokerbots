@@ -26,13 +26,17 @@ public class HandHistoryAnalyzer {
 																								// post-flop equity to post-flop net winnings
 	private static HashMap<String, int[]> totalNetAmtMap = new HashMap<String, int[]>(); //maps opponent to a histogram of 
 																								// pre-flop equity to total net winnings
+	public static int histogramLength = 11;
+	
 	private static HashMap<String, Match[]> opponentMap = new HashMap<String, Match[]>();
-	private static int[] preFlopPreEquityWins = new int[10];
-	private static int[] preFlopPreEquityHands = new int[10];
-	private static int[] postFlopPostEquityWins = new int[10];
-	private static int[] postFlopPostEquityHands = new int[10];
-	private static int[] preEquityWins = new int[10];
-	private static int[] preEquityHands = new int[10];
+	private static int[] preFlopPreEquityWins = new int[histogramLength];
+	private static int[] preFlopPreEquityHands = new int[histogramLength];
+	private static int[] postFlopPostEquityWins = new int[histogramLength];
+	private static int[] postFlopPostEquityHands = new int[histogramLength];
+	private static int[] preEquityWins = new int[histogramLength];
+	private static int[] preEquityHands = new int[histogramLength];
+	
+	
 	
 	/**
 	 * @param args
@@ -211,14 +215,14 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the net winnings for hands of different pre-flop equity ranges.");
 		System.out.println("We are looking at all hands.");
 		
-		int[] total = new int[10];
+		int[] total = new int[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				System.out.print((m1.getNetAmtWonByPreEquityHistogram()[i] + m2.getNetAmtWonByPreEquityHistogram()[i]) + "\t");
 				total[i] += m1.getNetAmtWonByPreEquityHistogram()[i] + m2.getNetAmtWonByPreEquityHistogram()[i];
 			}
@@ -226,7 +230,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(total[i] + "\t");
 		}
 		System.out.println("\n");
@@ -237,14 +241,14 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the net winnings for hands of different post-flop equity ranges.");
 		System.out.println("We are only looking at hands ending post-flop.");
 		
-		int[] total = new int[10];
+		int[] total = new int[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				System.out.print((m1.getPostFlopNetWinningsByPostEquity()[i] + m2.getPostFlopNetWinningsByPostEquity()[i]) + "\t");
 				total[i] += m1.getPostFlopNetWinningsByPostEquity()[i] + m2.getPostFlopNetWinningsByPostEquity()[i];
 			}
@@ -252,7 +256,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(total[i] + "\t");
 		}
 		System.out.println("\n");
@@ -263,14 +267,14 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the net winnings for hands of different pre-flop equity ranges.");
 		System.out.println("We are only looking at hands ending pre-flop.");
 		
-		int[] total = new int[10];
+		int[] total = new int[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				System.out.print((m1.getPreFlopNetWinAmtByEquity()[i] + m2.getPreFlopNetWinAmtByEquity()[i]) + "\t");
 				total[i] += m1.getPreFlopNetWinAmtByEquity()[i] + m2.getPreFlopNetWinAmtByEquity()[i];
 			}
@@ -278,7 +282,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(total[i] + "\t");
 		}
 		System.out.println("\n");
@@ -289,17 +293,17 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the winning percentage for hands of different pre-flop equity ranges.");
 		System.out.println("We are looking at all hands.");
 		
-		double[] totalWins = new double[10];
-		double[] totalHands = new double[10];
+		double[] totalWins = new double[histogramLength];
+		double[] totalHands = new double[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
-			int[] wins = new int[10];
-			int[] hands = new int[10];
+			int[] wins = new int[histogramLength];
+			int[] hands = new int[histogramLength];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				wins[i] += m1.getWinCountByPreEquityHistogram()[i];
 				wins[i] += m2.getWinCountByPreEquityHistogram()[i];
 				hands[i] += m1.getTotalCountByPreEquityHistogram()[i];
@@ -312,7 +316,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(((double)totalWins[i] / totalHands[i]) + "\t");
 		}
 		System.out.println("\n");
@@ -323,17 +327,17 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the winning percentage for hands of different post-flop equity ranges.");
 		System.out.println("We are only looking at hands that also end post-flop.");
 		
-		double[] totalWins = new double[10];
-		double[] totalHands = new double[10];
+		double[] totalWins = new double[histogramLength];
+		double[] totalHands = new double[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
-			int[] wins = new int[10];
-			int[] hands = new int[10];
+			int[] wins = new int[histogramLength];
+			int[] hands = new int[histogramLength];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				wins[i] += m1.getPostFlopPostEquityWinCount()[i];
 				wins[i] += m2.getPostFlopPostEquityWinCount()[i];
 				hands[i] += m1.getPostFlopPostEquityHandCount()[i];
@@ -346,7 +350,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(((double)totalWins[i] / totalHands[i]) + "\t");
 		}
 		System.out.println("\n");
@@ -357,17 +361,17 @@ public class HandHistoryAnalyzer {
 		System.out.println("\nPrinting out the winning percentage for hands of different pre-flop equity ranges.");
 		System.out.println("We are only looking at hands that also end pre-flop.");
 		
-		double[] totalWins = new double[10];
-		double[] totalHands = new double[10];
+		double[] totalWins = new double[histogramLength];
+		double[] totalHands = new double[histogramLength];
 		int count = 0;
 		for (String opponent : opponentMap.keySet()) {
 			Match[] mArr = opponentMap.get(opponent);
 			Match m1 = mArr[0];
 			Match m2 = mArr[1];
-			int[] wins = new int[10];
-			int[] hands = new int[10];
+			int[] wins = new int[histogramLength];
+			int[] hands = new int[histogramLength];
 			System.out.print(opponent + ":\t");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < histogramLength; i++) {
 				wins[i] += m1.getPreEquityWinCountPreFlop()[i];
 				wins[i] += m2.getPreEquityWinCountPreFlop()[i];
 				hands[i] += m1.getPreEquityHandCountPreFlop()[i];
@@ -380,7 +384,7 @@ public class HandHistoryAnalyzer {
 			
 		}
 		System.out.print("\nTotal:\t");
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < histogramLength; i++) {
 			System.out.print(((double)totalWins[i] / totalHands[i]) + "\t");
 		}
 		System.out.println("\n");
