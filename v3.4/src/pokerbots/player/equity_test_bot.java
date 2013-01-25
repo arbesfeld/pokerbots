@@ -9,9 +9,9 @@ public class equity_test_bot  {
 	}
 	
 	public static void main(String[] args) throws IOException{
-		Card h1 = g("9h");
-		Card h2 = g("7h");
-		Card h3 = g("7d");
+		Card h1 = g("8s");
+		Card h2 = g("Ts");
+		Card h3 = g("Ks");
 		
 		Card b1 = g("Ad");
 		Card b2 = g("As");
@@ -57,15 +57,15 @@ public class equity_test_bot  {
 //		for (String line : str)
 //			p.processInput(line)
 
-		System.out.println(HelperUtils.logistic(400, 400, 400));
-		BufferedReader input = new BufferedReader(new FileReader("v3.2.dump"));
-		Player p = new Player(null, input);
-		p.run();
+//		System.out.println(HelperUtils.logistic(400, 400, 400));
+//		BufferedReader input = new BufferedReader(new FileReader("v3.2.dump"));
+//		Player p = new Player(null, input);
+//		p.run();
 		
 	
 		long time1 = System.nanoTime();
 		
-		EquityCalculator e1 = new EquityCalculator(hand1, board, 1, 1, false);
+		EquityCalculator e1 = new EquityCalculator(hand1, null, 1, 1, false);
 		System.out.println("\nEquity hand1 : ");
 		System.out.println(e1.calculateTotalEquity());
 		long time2 = System.nanoTime();

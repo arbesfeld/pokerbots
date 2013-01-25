@@ -332,11 +332,19 @@ public class Historian {
 		}
 	}
 
-	public String getValueToSave() {
-		return "" + pfr; //save the pfr rate
+	public String getValueToSave(String key) {
+		if(key.equalsIgnoreCase("PFR")) {
+			return getPFR() + "";
+		}
+		else
+			return "";
 	}
 
-	public void notifyValue(String string, String string2) { //key value pair. the key is the opponent name right now
-		//pfr = Double.parseDouble(string2);
+	public void notifyValue(String name, String key, String val) { //key value pair. the key is the opponent name right now
+		if(name.equalsIgnoreCase(oppName)) {
+			if(key.equalsIgnoreCase("PFR")) {
+				pfr = Double.parseDouble(val);
+			}
+		}
 	}
 }

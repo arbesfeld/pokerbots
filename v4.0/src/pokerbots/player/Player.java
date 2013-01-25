@@ -1,8 +1,6 @@
 package pokerbots.player;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 public class Player {
 	private final PrintWriter outStream;
@@ -19,7 +17,21 @@ public class Player {
 	
 	public void run() {
 		String input;
+	
 		try {
+//			BufferedReader suited = new BufferedReader(new FileReader("suited.txt"));
+//			String line = suited.readLine();
+//			EquityUtils.threeSuited = new HashMap<String, Double>();
+//			
+//			while(line != null) {
+//				String[] tokens = line.split(",");
+//				for(String token : tokens) {
+//					String[] item = token.split(":");
+//					EquityUtils.threeSuited.put(item[0], Double.parseDouble(item[1]));
+//				}
+//				line = suited.readLine();
+//			}
+			
 			// Block until engine sends us a packet; read it into input.
 			while ((input = inStream.readLine()) != null) {
 
@@ -30,6 +42,7 @@ public class Player {
 				processInput(input);
 				
 			}
+			
 		} catch (IOException e) {
 			System.out.println("IOException: " + e.getMessage());
 		}
@@ -62,7 +75,12 @@ public class Player {
 		} 
 		
 		else if ("KEYVALUE".compareToIgnoreCase(word) == 0) {
-			maj.notifyValue(tokens[1], tokens[2]); //the key value pair
+			if(tokens.length < 2) 
+				return;
+			String[] smallTokens = tokens[1].split(":");
+			if(smallTokens.length < 2)
+				return;
+			maj.notifyValue(smallTokens[0], smallTokens[1], tokens[2]); //the key value pair
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
@@ -78,10 +96,10 @@ public class Player {
 			
 			boolean callRaise = false, checkRaise = false;
 
-			if(rand.nextDouble() < 0.2) {
+			if(rand.nextDouble() < 0.5) {
 				callRaise = true;
 			}
-			if(rand.nextDouble() < 0.3) {
+			if(rand.nextDouble() < 0.5) {
 				checkRaise = true;
 			}
 			
@@ -154,7 +172,7 @@ public class Player {
 			// At the end, engine will allow bot to send key/value pairs to store.
 			// FINISH indicates no more to store.
 			outStream.println("DELETE " + maj.oppName);
-			outStream.println("PUT " + maj.oppName + " " + maj.getValueToSave());
+			outStream.println("PUT " + maj.oppName + ":PFR " + maj.getValueToSave("PFR"));
 			outStream.println("FINISH");
 		}
 	}

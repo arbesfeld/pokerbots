@@ -16,7 +16,7 @@ public class EquityCalculator {
 		usedCards =      new boolean[cardCount];
 		winningBoards =  0;
 		possibleBoards = 0;
-		skip =           1;
+		skip =           2;
 		skip2 =          2;
 		
 		for(int i = 0; i < cardCount; i++)
@@ -53,22 +53,20 @@ public class EquityCalculator {
 		possibleBoards = 0;
 		
 		//pre-flop
-		if(board == null) {
-			//return equityPreFlopApprox();
-			return equityPreFlop();
-		}
-		//post-flop
-		else if(board[3] == null) {
-			return equityPostFlop(0);
-		}
-		//post-turn
-		else if(board[4] == null) {
-			return equityPostTurn(0);
-		}
-		//post-river
-		else {
-			return equityPostRiver();
-		}
+		return equityPreFlop();
+		
+//		//post-flop
+//		else if(board[3] == null) {
+//			return equityPostFlop(0);
+//		}
+//		//post-turn
+//		else if(board[4] == null) {
+//			return equityPostTurn(0);
+//		}
+//		//post-river
+//		else {
+//			return equityPostRiver();
+//		}
 	}
 	
 	private double equityPreFlopApprox() {
@@ -84,6 +82,8 @@ public class EquityCalculator {
 				continue;
 			board[0] = cardByID[i];
 			usedCards[i] = true;
+
+			long time1 = System.nanoTime();
 			
 			for(int j = i+1; j < cardCount; j += skip) {
 				if(usedCards[j])
@@ -98,8 +98,10 @@ public class EquityCalculator {
 					board[2] = cardByID[k];
 					usedCards[k] = true;
 					
+					Card[] oldHand = hand;
 					chooseDiscardCard();
 					equityPostFlop(k+1);
+					hand = oldHand;
 					
 					board[2] = null;
 					usedCards[k] = false;
@@ -107,7 +109,10 @@ public class EquityCalculator {
 				board[1] = null;
 				usedCards[j] = false;
 			}
-			
+			long time2 = System.nanoTime();
+			double totalTime = (time2 - time1) / Math.pow(10, 9) * 52 * 14 * 14 * 14 / 60 / 60; 
+			//System.out.println(i + "/52");
+			//System.out.println("Total time (hours): " + totalTime);
 			board[0] = null;
 			usedCards[i] = false;
 		}
@@ -115,9 +120,9 @@ public class EquityCalculator {
 	}
 	private void chooseDiscardCard() {
 		//assumes you have a three card hand
-		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board);
-		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board);
-		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board);
+		EquityCalculatorOld ec0 = new EquityCalculatorOld(new Card[]{hand[1], hand[2]}, board);
+		EquityCalculatorOld ec1 = new EquityCalculatorOld(new Card[]{hand[0], hand[2]}, board);
+		EquityCalculatorOld ec2 = new EquityCalculatorOld(new Card[]{hand[0], hand[1]}, board);
 		double equity0 = ec0.calculateTotalEquity();
 		double equity1 = ec1.calculateTotalEquity();
 		double equity2 = ec2.calculateTotalEquity();

@@ -28,34 +28,19 @@ public class Brain {
 	
 	private int skip1, skip2;
 	private EquityCalculator ec;
-	private boolean approx, callRaise, checkRaise;
+	private boolean swapSkip, callRaise, checkRaise;
 	
 	Brain(Historian maj, Card[] hand, double timebank, boolean callRaise, boolean checkRaise) {
 		this.maj = maj;
 		this.callRaise = callRaise;
 		this.checkRaise = checkRaise;
 		dory = new Dory(this, maj);	
-		
-		skip1 = 1; 
-		skip2 = 2;
-		
-		approx = true;
-		
-		if(approx) {
-			skip1 = 3;
-		}
-		else {
-			skip1 = 1;
-		}
-		
-		this.timebank = timebank;
-		
-		if(timebank < 10) {
-			skip1 = 5;
-			skip2 = 3;
-		}
 
-		ec = new EquityCalculator(hand, null, skip1, skip2, approx);
+		swapSkip = false;
+		skip1 = 3;
+		skip2 = 2;
+
+		ec = new EquityCalculator(hand, null, skip1, skip2, swapSkip);
 		this.hand = hand;
 		
 		
@@ -148,9 +133,9 @@ public class Brain {
 	//////////////////////////////////////////////
 	private void chooseDiscardCard() {
 		//assumes you have a three card hand
-		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board, skip1, skip2, approx);
-		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board, skip1, skip2, approx);
-		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board, skip1, skip2, approx);
+		EquityCalculator ec0 = new EquityCalculator(new Card[]{hand[1], hand[2]}, board, skip1, skip2, swapSkip);
+		EquityCalculator ec1 = new EquityCalculator(new Card[]{hand[0], hand[2]}, board, skip1, skip2, swapSkip);
+		EquityCalculator ec2 = new EquityCalculator(new Card[]{hand[0], hand[1]}, board, skip1, skip2, swapSkip);
 		double equity0 = ec0.calculateTotalEquity();
 		double equity1 = ec1.calculateTotalEquity();
 		double equity2 = ec2.calculateTotalEquity();
