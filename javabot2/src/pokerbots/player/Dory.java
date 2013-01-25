@@ -8,12 +8,12 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.00022;
+	double pfRaiseFactor = 0.035;
 	double pfCallFactor = 0.05;
 	double pfCheckFactor = 0.2;
 	
 	double aggroFactor = 0.2;
-	double sdwFactor = 0.1;
+	double sdwFactor = 0.3;
 	double pfrDivFactor = 4.0;
 	public GameState currentState;
 	private Brain brain;
@@ -99,7 +99,6 @@ public class Dory {
 	//my actions
 	private void myPostAction(PerformedAction performedAction) {
 		myBetsThisStreet += performedAction.getAmount();
-		changeEquity += (maj.getSDWRate() - 0.5) / 2;
 	}
 	
 	private void myRaiseAction(PerformedAction performedAction) {
@@ -125,17 +124,17 @@ public class Dory {
 	
 	private void theirPostAction(PerformedAction performedAction) {
 		theirBetsThisStreet += performedAction.getAmount();
-		//changeEquity += (maj.getSDWRate() - 1.5) * sdwFactor;
+		changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor;
 	}
 	
 	private void theirRaiseAction(PerformedAction performedAction) {
 
-		
-		if(performedAction.getAmount() - theirBetsThisStreet < 11) {
+		double potBet = (double)(performedAction.getAmount() - theirBetsThisStreet) / brain.potSize;
+		if(potBet < 0.2) {
 			theirBetsThisStreet += performedAction.getAmount();
 			return;
 		}
-
+		
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 		
 		double PFR = maj.getPFR();
@@ -144,7 +143,7 @@ public class Dory {
 			adjustedPFR = PFR;
 		
 		//if(currentState == GameState.PREFLOP) { 
-			changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, (performedAction.getAmount() - theirBetsThisStreet)) / 
+			changeEquity -= pfRaiseFactor * HelperUtils.logisticSmall(3.0, 3.0, potBet) / 
 					((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
 			// equity -= c * logistic(their raise) / PFR / #of their raises
 		//}
@@ -155,11 +154,11 @@ public class Dory {
 	
 	private void theirBetAction(PerformedAction performedAction) {
 		theirBetsThisStreet += performedAction.getAmount();
-
 		
-		if(performedAction.getAmount() < 11)
-			return;
+		double potBet = (double)performedAction.getAmount() / brain.potSize;
 
+		if(potBet < 0.2) 
+			return;
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 		
 		double PFR = maj.getPFR();
@@ -167,7 +166,7 @@ public class Dory {
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
 		
-		changeEquity -= pfRaiseFactor * HelperUtils.logistic(maj.stackSize, maj.stackSize, performedAction.getAmount()) / 
+		changeEquity -= pfRaiseFactor * HelperUtils.logisticSmall(3.0, 3.0, potBet) / 
 				((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
 		
 		changeEquityCall = 0.0;

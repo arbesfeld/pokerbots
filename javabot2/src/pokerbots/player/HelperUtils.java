@@ -53,4 +53,9 @@ public class HelperUtils {
     	double c = 1.0 / Math.exp(-max1 / 2);
     	return 100 * ( max2 * 2 / (1 + c * Math.exp(-(input + max1 / 2))) - max2 );
     }
+    
+    public static double logisticSmall(double max1, double max2, double input) {
+    	double c = 1.0 / Math.exp(-max1 / 2);
+    	return 1 * ( max2 * 2 / (1 + c * Math.exp(-(input + max1 / 2))) - max2 );
+    }
 }

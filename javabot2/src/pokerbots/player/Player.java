@@ -9,7 +9,8 @@ public class Player {
 	private Brain brain;
 	private Historian maj;
 	private int numHands;
-	
+	private boolean cons;
+	private int consEarnings, regEarnings;
 	public Player(PrintWriter output, BufferedReader input) {
 		this.outStream = output;
 		this.inStream = input;
@@ -17,7 +18,10 @@ public class Player {
 	
 	public void run() {
 		String input;
-	
+
+		consEarnings = 0;
+		regEarnings = 0;
+		cons = false;
 		try {
 //			BufferedReader suited = new BufferedReader(new FileReader("suited.txt"));
 //			String line = suited.readLine();
@@ -62,7 +66,6 @@ public class Player {
 	public void processInput(String input) {
 		String[] tokens = input.split(" ");
 		String word = tokens[0];
-		
 		if ("NEWGAME".compareToIgnoreCase(word) == 0) {
 			String myName =    tokens[1];
 			String oppName =   tokens[2];
@@ -84,7 +87,20 @@ public class Player {
 		}
 		
 		else if ("NEWHAND".compareToIgnoreCase(word) == 0) {
-
+			int handNum = Integer.parseInt(tokens[1]);
+			
+			if(handNum == numHands/4) 
+				cons = true;
+			if(handNum == numHands*2/4) {
+				System.out.println("Reg earnings: " + regEarnings + " consEarnings: " + consEarnings);
+				if(consEarnings > regEarnings)
+					cons = true;
+				else
+					cons = false;
+			}
+			
+			System.out.println("Using conservative brain? " + cons);
+			
 			Card[] hand = new Card[3];
 			hand[0] = CardUtils.getCardByString(tokens[3]);
 			hand[1] = CardUtils.getCardByString(tokens[4]);
@@ -103,7 +119,10 @@ public class Player {
 				checkRaise = true;
 			}
 			
-			brain = new Brain(maj, hand, timebank, callRaise, checkRaise);
+			if(cons)
+				brain = new ConservativeBrain(maj, hand, timebank, callRaise, checkRaise);
+			else
+				brain = new Brain(maj, hand, timebank, callRaise, checkRaise);
 			
 			brain.handId = Integer.parseInt(tokens[1]);
 			brain.button = Boolean.parseBoolean(tokens[2]);
@@ -148,6 +167,13 @@ public class Player {
 		else if ("HANDOVER".compareToIgnoreCase(word) == 0) {
 			brain.myBank = Integer.parseInt(tokens[1]);
 			brain.oppBank = Integer.parseInt(tokens[2]);
+			
+			if(cons) {
+				consEarnings = brain.myBank - regEarnings;
+			}
+			else {
+				regEarnings = brain.myBank;
+			}
 			
 			brain.numBoardCards = Integer.parseInt(tokens[3]);
 			int i = 4;

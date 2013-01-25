@@ -209,8 +209,6 @@ public class Historian {
 	
 	void processPreflopAction(PerformedAction pa) {
 		if (pa.getType().equalsIgnoreCase("RAISE")) {
-			if(pa.getAmount() < 11)
-				return;
 			if (roundRaiseCount == 0) {
 				preFlopRaiser = pa.getActor().equalsIgnoreCase(oppName);
 				if (preFlopRaiser) {
@@ -238,6 +236,10 @@ public class Historian {
 				}
 			}
 		} else if (pa.getType().equalsIgnoreCase("CALL")) {
+			if(roundRaiseCount == 0) {
+				//pfrCount++;
+				//roundRaiseCount++;
+			}
 			
 		} else if (pa.getType().equalsIgnoreCase("CHECK")) {
 			

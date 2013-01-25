@@ -57,20 +57,20 @@ public class equity_test_bot  {
 //		for (String line : str)
 //			p.processInput(line)
 
-		System.out.println(HelperUtils.logistic(400, 400, 400));
-		BufferedReader input = new BufferedReader(new FileReader("v3.2.dump"));
-		Player p = new Player(null, input);
-		p.run();
-		
-	
-		long time1 = System.nanoTime();
-		
-		EquityCalculator e1 = new EquityCalculator(hand1, board, 1, 1, false);
-		System.out.println("\nEquity hand1 : ");
-		System.out.println(e1.calculateTotalEquity());
-		long time2 = System.nanoTime();
-		
-		System.out.println("Elapsed time: " + (time2-time1)/Math.pow(10, 9));
+		System.out.println(HelperUtils.logisticSmall(3.0, 3.0, 0.5));
+//		BufferedReader input = new BufferedReader(new FileReader("v3.2.dump"));
+//		Player p = new Player(null, input);
+//		p.run();
+//		
+//	
+//		long time1 = System.nanoTime();
+//		
+//		EquityCalculator e1 = new EquityCalculator(hand1, board, 1, 1, false);
+//		System.out.println("\nEquity hand1 : ");
+//		System.out.println(e1.calculateTotalEquity());
+//		long time2 = System.nanoTime();
+//		
+//		System.out.println("Elapsed time: " + (time2-time1)/Math.pow(10, 9));
 	}
 	
 	static void printBoard(Card[] board) {

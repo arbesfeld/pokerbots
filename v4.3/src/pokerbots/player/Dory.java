@@ -8,7 +8,7 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.035;
+	double pfRaiseFactor = 0.03;
 	double pfCallFactor = 0.05;
 	double pfCheckFactor = 0.2;
 	
@@ -129,7 +129,7 @@ public class Dory {
 	
 	private void theirRaiseAction(PerformedAction performedAction) {
 
-		double potBet = (double)(performedAction.getAmount() - theirBetsThisStreet) / brain.potSize;
+		double potBet = (double)(performedAction.getAmount() - theirBetsThisStreet) / (brain.potSize - performedAction.getAmount());
 		if(potBet < 0.2) {
 			theirBetsThisStreet += performedAction.getAmount();
 			return;
@@ -155,7 +155,7 @@ public class Dory {
 	private void theirBetAction(PerformedAction performedAction) {
 		theirBetsThisStreet += performedAction.getAmount();
 		
-		double potBet = (double)performedAction.getAmount() / brain.potSize;
+		double potBet = (double)performedAction.getAmount() / (brain.potSize - performedAction.getAmount());
 
 		if(potBet < 0.2) 
 			return;
