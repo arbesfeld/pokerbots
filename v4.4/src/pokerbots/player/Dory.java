@@ -14,7 +14,7 @@ public class Dory {
 	
 	double aggroFactor = 0.2;
 	double sdwFactor = 0.3;
-	double pfrDivFactor = 4.0;
+	double pfrDivFactor = 1.0;
 	public GameState currentState;
 	private Brain brain;
 	private Historian maj;
