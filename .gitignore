@@ -9,3 +9,6 @@ match*.txt
 .metadata/
 */.metdata/
 handlog*
+BalancedSmileys/
+BeautifulSmileys/
+FindMin/

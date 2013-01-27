@@ -8,9 +8,9 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.03;
+	double pfRaiseFactor = 0.0003;
 	double pfCallFactor = 0.05;
-	double pfCheckFactor = 0.2;
+	double pfCheckFactor = 0.15;
 	
 	double aggroFactor = 0.2;
 	double sdwFactor = 0.3;
@@ -142,8 +142,10 @@ public class Dory {
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
 		
+		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
+				          Math.min(150.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount() - theirBetsThisStreet) + 100.0) / 2);
 		//if(currentState == GameState.PREFLOP) { 
-			changeEquity -= pfRaiseFactor * HelperUtils.logisticSmall(3.0, 3.0, potBet) / 
+			changeEquity -= pfRaiseFactor *  logFactor / 
 					((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
 			// equity -= c * logistic(their raise) / PFR / #of their raises
 		//}
@@ -166,8 +168,9 @@ public class Dory {
 		if(PFR > 0.5)
 			adjustedPFR = PFR;
 		
-		changeEquity -= pfRaiseFactor * HelperUtils.logisticSmall(3.0, 3.0, potBet) / 
-				((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
+		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
+		                   Math.min(150.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount()) + 100.0) / 2);
+		changeEquity -= pfRaiseFactor * logFactor / ((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
 		
 		changeEquityCall = 0.0;
 	}
@@ -208,12 +211,18 @@ public class Dory {
 		
 		if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
 			currentState = GameState.PRETURN;
+
+			//changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 2.0;
 		}
 		else if(performedAction.getStreet().equalsIgnoreCase("TURN")) {
 			currentState = GameState.PRERIVER;
+
+			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 3.0;
 		}
 		else if(performedAction.getStreet().equalsIgnoreCase("RIVER")) {
 			currentState = GameState.POSTRIVER;
+
+			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 3.0;
 		}
 	}
 	

@@ -188,19 +188,19 @@ public class Brain {
 			return call();
 		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[2], eVals[3], sVals[0], sVals[1]);
+			return putLin(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
 		}
 		else if(eL(4)) {
-			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
+			return putLin(dory.liqEquity(), eVals[3], eVals[4], pVals[1], pVals[2]);
 		}
 		else if(eL(5)) {
-			return putLin(dory.liqEquity(), eVals[4], eVals[5], sVals[2], sVals[3]);
+			return putLin(dory.liqEquity(), eVals[4], eVals[5], pVals[2], pVals[3]);
 		}
 		else if(eL(6)) {
-			return putLin(dory.liqEquity(), eVals[5], eVals[6], sVals[3], sVals[4]);
+			return putLin(dory.liqEquity(), eVals[5], eVals[6], pVals[3], pVals[4]);
 		}
 		else {
-			return putLin(dory.liqEquity(), eVals[6], eVals[7], sVals[4], sVals[5]);
+			return putLin(dory.liqEquity(), eVals[6], eVals[7], pVals[4], pVals[5]);
 		}
 	}
 	
@@ -212,19 +212,19 @@ public class Brain {
 			return call();
 		}
 		else if(eL(3)) { 
-			return putLin(dory.liqEquity(), eVals[2], eVals[3], sVals[0], sVals[1]);
+			return putLin(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
 		}
 		else if(eL(4)) {
-			return putLin(dory.liqEquity(), eVals[3], eVals[4], sVals[1], sVals[2]);
+			return putLin(dory.liqEquity(), eVals[3], eVals[4], pVals[1], pVals[2]);
 		}
 		else if(eL(5)) {
-			return putLin(dory.liqEquity(), eVals[4], eVals[5], sVals[2], sVals[3]);
+			return putLin(dory.liqEquity(), eVals[4], eVals[5], pVals[2], pVals[3]);
 		}
 		else if(eL(6)) {
-			return putLin(dory.liqEquity(), eVals[5], eVals[6], sVals[3], sVals[4]);
+			return putLin(dory.liqEquity(), eVals[5], eVals[6], pVals[3], pVals[4]);
 		}
 		else {
-			return putLin(dory.liqEquity(), eVals[6], eVals[7], sVals[4], sVals[5]);
+			return putLin(dory.liqEquity(), eVals[6], eVals[7], pVals[4], pVals[5]);
 		}
 	}
 	
