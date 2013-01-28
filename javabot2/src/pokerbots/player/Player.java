@@ -192,6 +192,10 @@ public class Player {
 			maj.numHandsPlayed++;
 			
 			System.out.println("\nPFR: " + maj.getPFR());
+			System.out.println("AGGRO: " + maj.getAggression());
+			System.out.println("AGGROFREQ: " + maj.getAggressionFrequency());
+			System.out.println("CALLRAISE: " + maj.getCallRaise());
+			System.out.println("CHECKRAISE: " + maj.getCheckRaise());
 			System.out.println("SDW: " + maj.getSDWRate() + "\n");
 		}
 		
@@ -201,6 +205,10 @@ public class Player {
 			outStream.println("DELETE " + maj.oppName);
 			outStream.println("PUT " + maj.oppName + ":PFR " + maj.getValueToSave("PFR"));
 			outStream.println("PUT " + maj.oppName + ":SDW " + maj.getValueToSave("SDW"));
+			outStream.println("PUT " + maj.oppName + ":AGGRO " + maj.getValueToSave("AGGRO"));
+			outStream.println("PUT " + maj.oppName + ":AGGROFREQ " + maj.getValueToSave("AGGROFREQ"));
+			outStream.println("PUT " + maj.oppName + ":CALLRAISE " + maj.getValueToSave("CALLRAISE"));
+			outStream.println("PUT " + maj.oppName + ":CHECKRAISE " + maj.getValueToSave("CHECKRAISE"));
 			outStream.println("FINISH");
 		}
 	}

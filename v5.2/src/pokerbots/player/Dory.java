@@ -8,7 +8,7 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.00027;
+	double pfRaiseFactor = 0.00026;
 	double pfCallFactor = 0.05;
 	double pfCheckFactor = 0.15;
 	double callRaiseFactor = 0.02;
@@ -148,7 +148,7 @@ public class Dory {
 		double AGGROFREQ = adjustAggroFreq(maj.getAggressionFrequency());
 		
 		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
-				           Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount() - theirBetsThisStreet) + 100.0) / 2);
+				           Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount() - theirBetsThisStreet) + 300.0) / 4);
 		
 		if(currentState == GameState.PREFLOP) { 
 			changeEquity -= pfRaiseFactor *  logFactor / PFR;
@@ -176,7 +176,7 @@ public class Dory {
 		double AGGROFREQ = adjustAggroFreq(maj.getAggressionFrequency());
 		
 		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
-		                   Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount()) + 100.0) / 2);
+		                   Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount()) + 300.0) / 4);
 		
 		if(currentState == GameState.PREFLOP) {
 			changeEquity -= pfRaiseFactor * logFactor / PFR;

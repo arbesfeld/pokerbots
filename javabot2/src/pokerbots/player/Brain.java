@@ -188,43 +188,43 @@ public class Brain {
 			return call();
 		}
 		else if(eL(3)) { 
-			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
+			return call();//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
 		}
 		else if(eL(4)) {
-			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[1], pVals[2]);
+			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(5)) {
-			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[2], pVals[3]);
+			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[3], pVals[4]);
 		}
 		else if(eL(6)) {
-			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[3], pVals[4]);
+			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[4], pVals[5]);
 		}
 		else {
-			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[4], pVals[5]);
+			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[5], pVals[6]);
 		}
 	}
 	
 	protected Action actPreFlopNotButton() { //big blind acts second
-		if(eL(1)) {
+		if(eL(0)) {
 			return checkFold();
 		}
-		else if(eL(2)) {
+		else if(eL(1)) {
 			return call();
 		}
-		else if(eL(3)) { 
-			return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
+		else if(eL(2)) { 
+			return call();//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[0], pVals[1]);
+		}
+		else if(eL(3)) {
+			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(4)) {
-			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[1], pVals[2]);
+			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[3], pVals[4]);
 		}
 		else if(eL(5)) {
-			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[2], pVals[3]);
-		}
-		else if(eL(6)) {
-			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[3], pVals[4]);
+			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[4], pVals[5]);
 		}
 		else {
-			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[4], pVals[5]);
+			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[5], pVals[6]);
 		}
 	}
 	
@@ -245,16 +245,16 @@ public class Brain {
 			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
 		}
 		else if(eL(4)) {
-			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
+			return call();//return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(5)) {
-			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[3], pVals[4]);
+			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[4], pVals[5]);
 		}
 		else if(eL(6)) {
-			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[4], pVals[5]); 
+			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[5], pVals[6]); 
 		}
 		else {
-			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[5], pVals[6]);
+			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[6], pVals[7]);
 		}
 	}
 	
@@ -274,16 +274,16 @@ public class Brain {
 			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
 		}
 		else if(eL(4)) {
-			return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
+			return call();//return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(5)) {
-			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[3], pVals[4]);
+			return putPotPercentage(dory.liqEquity(), eVals[4], eVals[5], pVals[4], pVals[5]);
 		}
 		else if(eL(6)) {
-			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[4], pVals[5]); 
+			return putPotPercentage(dory.liqEquity(), eVals[5], eVals[6], pVals[5], pVals[6]); 
 		}
 		else {
-			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[5], pVals[6]);
+			return putPotPercentage(dory.liqEquity(), eVals[6], eVals[7], pVals[6], pVals[7]);
 		}
 	}
 	
