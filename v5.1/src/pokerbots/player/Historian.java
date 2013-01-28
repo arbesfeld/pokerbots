@@ -43,6 +43,7 @@ public class Historian {
 	private int fbCount; // fold to continuation bets
 	private int f2Count; // fold to second barrels
 	private int sdwCount;
+	private int foldCount;
 	
 	// default stats (the "placeholder" values we use when calculating stuff")
 	private double vpip = 0.8;
@@ -57,6 +58,7 @@ public class Historian {
 	private double bFold = 0.4;
 	private double aggression = 1.5;
 	private double sdw = 0.5;
+	private double aggroFreq = 0.5;
 	
 	private Dory dory;
 	private Brain brain;
@@ -114,6 +116,7 @@ public class Historian {
 		fbCount = 0; // fold to continuation bets
 		f2Count = 0; // fold to second barrels
 		sdwCount = 0;
+		foldCount = 0;
 	}
 	
 	public void setHand(Dory dory, Brain brain) {
@@ -159,12 +162,14 @@ public class Historian {
 	}
 	
 	public double getAggression() {
-		double raise = ((double)raiseCount) / actionCount;
-		double bet = ((double)betCount) / actionCount;
-		double call = ((double)callCount) / actionCount;
-		return (50 * aggression + (raise + bet) / call) / (50 + (raise + bet) / call);
+		double rate = (double) (raiseCount + betCount) / Math.max(1, callCount);
+		return (200 * aggression + rate * actionCount) / (200 + actionCount);
 	}
-	
+	public double getAggressionFrequency() {
+		double rate = (double) (raiseCount + betCount) / Math.max(1, raiseCount + betCount + callCount + foldCount);
+		
+		return (200 * aggroFreq + rate * (raiseCount + betCount + callCount + foldCount)) / (200 + (raiseCount + betCount + callCount + foldCount));
+	}
 	public double getWTSD() {
 		double rate = ((double)showdownCount) / seenFlopCount;
 		return (50*wtsd + rate*seenFlopCount) / (seenFlopCount + 50);
@@ -234,7 +239,9 @@ public class Historian {
 					my3BetCount++;
 				}
 			}
-		} else if (pa.getType().equalsIgnoreCase("FOLD")) {
+		} 
+		else if (pa.getType().equalsIgnoreCase("FOLD")) {
+			
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
 				if (roundRaiseCount == 0) {
 					initFoldCount++; //opp didn't play hand
@@ -244,11 +251,8 @@ public class Historian {
 					f3Count++;
 				}
 			}
-		} else if (pa.getType().equalsIgnoreCase("CALL")) {
-			if(roundRaiseCount == 0) {
-				//pfrCount++;
-				//roundRaiseCount++;
-			}
+		} 
+		else if (pa.getType().equalsIgnoreCase("CALL")) {
 			
 		} else if (pa.getType().equalsIgnoreCase("CHECK")) {
 			
@@ -267,6 +271,9 @@ public class Historian {
 	
 	void processPostFlopAction(PerformedAction pa) {
 		if (pa.getType().equalsIgnoreCase("RAISE")) {
+			if((double)(pa.getAmount() - dory.theirBetsThisStreet) / (brain.potSize - pa.getAmount()) < 0.2)
+				return;
+			
 			roundRaiseCount++;
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
 				raiseCount++;
@@ -292,6 +299,8 @@ public class Historian {
 			}
 		} else if (pa.getType().equalsIgnoreCase("FOLD")) {
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
+				foldCount++;
+	
 				if (cBetting && currentState == GameState.PRETURN) {
 					fbCount++;
 				} else if (barrelling) {
@@ -299,6 +308,8 @@ public class Historian {
 				}
 			}
 		} else if (pa.getType().equalsIgnoreCase("BET")) {
+			if((double) pa.getAmount() / (brain.potSize - pa.getAmount()) < 0.2)
+				return;
 			if (pa.getActor().equalsIgnoreCase(oppName)) {
 				betCount++;
 				actionCount++;
@@ -350,6 +361,12 @@ public class Historian {
 		else if(key.equalsIgnoreCase("SDW")) {
 			return getSDWRate() + "";
 		}
+		else if(key.equalsIgnoreCase("AGGRO")) {
+			return getAggression() + "";
+		}
+		else if(key.equalsIgnoreCase("AGGROFREQ")) {
+			return getAggressionFrequency() + "";
+		}
 		else
 			return "";
 	}
@@ -359,8 +376,14 @@ public class Historian {
 			if(key.equalsIgnoreCase("PFR")) {
 				pfr = Double.parseDouble(val);
 			}
-			if(key.equalsIgnoreCase("SDW")) {
+			else if(key.equalsIgnoreCase("SDW")) {
 				sdw = Double.parseDouble(val);
+			}
+			else if(key.equalsIgnoreCase("AGGRO")) {
+				aggression = Double.parseDouble(val);
+			}
+			else if(key.equalsIgnoreCase("AGGROFREQ")) {
+				aggroFreq = Double.parseDouble(val);
 			}
 		}
 	}

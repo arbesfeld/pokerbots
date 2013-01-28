@@ -8,13 +8,17 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.0003;
+	double pfRaiseFactor = 0.00027;
 	double pfCallFactor = 0.05;
 	double pfCheckFactor = 0.15;
 	
 	double aggroFactor = 0.2;
 	double sdwFactor = 0.3;
+	
 	double pfrDivFactor = 1.0;
+	double aggroDivFactor = 1.0;
+	double aggroFreqDivFactor = 1.0;
+	
 	public GameState currentState;
 	private Brain brain;
 	private Historian maj;
@@ -137,18 +141,19 @@ public class Dory {
 		
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 		
-		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
-		if(PFR > 0.5)
-			adjustedPFR = PFR;
+		double PFR = adjustPFR(maj.getPFR());
+		double AGGRO = adjustAggro(maj.getAggression());
+		double AGGROFREQ = adjustAggroFreq(maj.getAggressionFrequency());
 		
 		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
-				          Math.min(150.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount() - theirBetsThisStreet) + 100.0) / 2);
-		//if(currentState == GameState.PREFLOP) { 
-			changeEquity -= pfRaiseFactor *  logFactor / 
-					((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
-			// equity -= c * logistic(their raise) / PFR / #of their raises
-		//}
+				           Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount() - theirBetsThisStreet) + 100.0) / 2);
+		
+		if(currentState == GameState.PREFLOP) { 
+			changeEquity -= pfRaiseFactor *  logFactor / PFR;
+		}
+		else {
+			changeEquity -= pfRaiseFactor * logFactor / AGGROFREQ;
+		}
 		
 		changeEquityCall = 0.0;
 		theirBetsThisStreet += performedAction.getAmount();
@@ -161,26 +166,29 @@ public class Dory {
 
 		if(potBet < 0.2) 
 			return;
+		
 		theirRaiseHistory[currentState.ordinal()].add(performedAction.getAmount());
 		
-		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
-		if(PFR > 0.5)
-			adjustedPFR = PFR;
+		double PFR = adjustPFR(maj.getPFR());
+		double AGGRO = adjustAggro(maj.getAggression());
+		double AGGROFREQ = adjustAggroFreq(maj.getAggressionFrequency());
 		
 		double logFactor = HelperUtils.logisticSmall(3.0, 3.0, potBet) * 
-		                   Math.min(150.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount()) + 100.0) / 2);
-		changeEquity -= pfRaiseFactor * logFactor / ((adjustedPFR - 0.5) / pfrDivFactor + 0.5);
+		                   Math.min(100.0, (HelperUtils.logistic(400.0, 400.0, performedAction.getAmount()) + 100.0) / 2);
+		
+		if(currentState == GameState.PREFLOP) {
+			changeEquity -= pfRaiseFactor * logFactor / PFR;
+		}
+		else {
+			changeEquity -= pfRaiseFactor * logFactor / AGGROFREQ;
+		}
 		
 		changeEquityCall = 0.0;
 	}
 	
 	private void theirCallAction(PerformedAction performedAction) {
 		//if(currentState == GameState.PREFLOP) { 
-		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
-		if(PFR > 0.5)
-			adjustedPFR = PFR;
+		double PFR = adjustPFR(maj.getPFR());
 		
 		//changeEquityCall = pfCallFactor * adjustedPFR / (1.0 + theirRaiseHistory[currentState.ordinal()].size() + myRaiseHistory[currentState.ordinal()].size());
 			// equity += d * pfr / (1 + total number of raises (both players))
@@ -192,12 +200,16 @@ public class Dory {
 	private void theirCheckAction(PerformedAction performedAction) {
 		checkHistory[currentState.ordinal()] = true;
 		
-		double PFR = maj.getPFR();
-		double adjustedPFR = 0.25 / (1 - PFR);
-		if(PFR > 0.5)
-			adjustedPFR = PFR;
+		double PFR = adjustPFR(maj.getPFR());
+		double AGGRO = adjustAggro(maj.getAggression());
+		double AGGROFREQ = adjustAggroFreq(maj.getAggressionFrequency());
 		
-		changeEquityCall = pfCheckFactor * adjustedPFR;
+		if(currentState == GameState.PREFLOP) {
+			changeEquityCall = pfCheckFactor * PFR;
+		}
+		else {
+			changeEquityCall = pfCheckFactor * AGGROFREQ;
+		}
 	}
 
 	private void streetAction(PerformedAction performedAction) {
@@ -217,13 +229,36 @@ public class Dory {
 		else if(performedAction.getStreet().equalsIgnoreCase("TURN")) {
 			currentState = GameState.PRERIVER;
 
-			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 3.0;
+			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 4.0;
 		}
 		else if(performedAction.getStreet().equalsIgnoreCase("RIVER")) {
 			currentState = GameState.POSTRIVER;
 
-			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 3.0;
+			changeEquity += (maj.getSDWRate() - 0.6) * sdwFactor / 4.0;
 		}
+	}
+	
+	private double adjustPFR(double PFR) {
+		if (PFR > 0.5)
+			return (PFR - 0.5) / pfrDivFactor + 0.5;
+		else
+			return  (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
+	}
+	
+	private double adjustAggro(double AGGRO) {
+		AGGRO /= 3.0;
+		
+		if (AGGRO > 0.5)
+			return Math.min(3.0, (AGGRO - 0.5) / aggroDivFactor + 0.5);
+		else
+			return (0.25 / (1 - AGGRO) - 0.5) / aggroDivFactor + 0.5;
+	}
+	
+	private double adjustAggroFreq(double AGGROFREQ) {
+		if (AGGROFREQ > 0.5)
+			return (AGGROFREQ - 0.5) / aggroFreqDivFactor + 0.5;
+		else
+			return  (0.25 / (1 - AGGROFREQ) - 0.5) / aggroFreqDivFactor + 0.5;
 	}
 	
 	public int lastOpponentRaiseSize() {
@@ -254,4 +289,5 @@ public class Dory {
 	public double liqEquity() {
 		return brain.equity + changeEquity + changeEquityCall;
 	}
+	
 }
