@@ -28,8 +28,7 @@ public class Brain {
 	
 	protected int skip1, skip2;
 	protected EquityCalculator ec;
-	protected boolean swapSkip, callRaise, checkRaise, semibluff;
-	protected int wetness;
+	protected boolean swapSkip, callRaise, checkRaise;
 	
 	Brain(Historian maj, Card[] hand, double timebank, boolean callRaise, boolean checkRaise) {
 		this.maj = maj;
@@ -37,6 +36,7 @@ public class Brain {
 		this.checkRaise = checkRaise;
 		dory = new Dory(this, maj);	
 		maj.setHand(dory, this);
+		swapSkip = false;
 		swapSkip = false;
 		skip1 = 2;
 		skip2 = 3;
@@ -49,11 +49,9 @@ public class Brain {
 			skip1 = 5;
 			skip2 = 4;
 		}
-		
 		ec = new EquityCalculator(hand, null, skip1, skip2, swapSkip);
 		this.hand = hand;
 		
-		semibluff = true;
 		
 		//the higher these numbers are, the more aggressive the bot is
 		
@@ -68,7 +66,6 @@ public class Brain {
 		//should range from 0.05 to 3.0, play around with these a lot
 		pVals = new double[]{0.1, 0.25, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 3.0};
 	}
-	
 	public void reset() {
 		raiseAction = null;
 		betAction = null;
@@ -78,7 +75,6 @@ public class Brain {
 		canCall = false;
 		canDiscard = false;
 	}
-	
 	public Action act() {
 		reset();
 
@@ -113,7 +109,6 @@ public class Brain {
 				ec.setBoard(board);
 				if(performedAction.getStreet().equalsIgnoreCase("FLOP")) {
 					chooseDiscardCard(); //this will also update equity
-					wetness = ec.boardWetness();
 				}
 				else {
 					equity = ec.calculateTotalEquity();
@@ -249,20 +244,16 @@ public class Brain {
 	
 	protected Action actPostFlopButton() {    //acts second
 		if(eL(3)) {
-			if(semibluff && dory.theirBetsThisStreet == 0 && wetness > 0) {
-				semibluff = false;
-				return putMin();
-			}
 			if(dory.theirBetsThisStreet - dory.myBetsThisStreet < pV(0))
 				return call();
-			
 			return checkFold();
 		}
+		else if(eL(3)) {
+			return call();
+			//return checkFoldCallPotOdds();
+			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
+		}
 		else if(eL(4)) {
-			if(semibluff && dory.theirBetsThisStreet == 0 && wetness > 0) {
-				semibluff = false;
-				return putMin();
-			}
 			return call();//return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(5)) {
@@ -284,14 +275,14 @@ public class Brain {
 		if(eL(3)) {
 			if(dory.theirBetsThisStreet - dory.myBetsThisStreet < pV(0))
 				return call();
-			
 			return checkFold();
 		}
+		else if(eL(3)) {
+			return call();
+			//return checkFoldCallPotOdds();
+			//return putPotPercentage(dory.liqEquity(), eVals[2], eVals[3], pVals[1], pVals[2]);
+		}
 		else if(eL(4)) {
-			if(semibluff && dory.theirBetsThisStreet == 0 && wetness > 0) {
-				semibluff = false;
-				return putMin();
-			}
 			return call();//return putPotPercentage(dory.liqEquity(), eVals[3], eVals[4], pVals[2], pVals[3]);
 		}
 		else if(eL(5)) {
@@ -527,7 +518,7 @@ public class Brain {
 	}
 	
 	protected Action raiseMin() {
-		return raise(raiseAction.getMin() + 1);
+		return raise(raiseAction.getMin() + 2);
 	}
 	
 	protected Action raiseLin(double percent, double inLo, double inHi, double outLo, double outHi) {
