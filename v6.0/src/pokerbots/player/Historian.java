@@ -19,7 +19,6 @@ public class Historian {
 	public int numHandsPlayed; //hands played so far 
 	private int winCount; //your win rate
 	public int instantFold;
-	public double startingTime;
 	
 	// pre-flop stats
 	private int pfrCount; //pre-flop raise
@@ -76,7 +75,7 @@ public class Historian {
 		POSTRIVER
 	}
 	
-	public Historian(String myName, String oppName, int stackSize, int bb, double startingTime) {
+	public Historian(String myName, String oppName, int stackSize, int bb) {
 		this.myName = myName;
 		this.oppName = oppName;
 		this.stackSize = stackSize;
@@ -84,7 +83,6 @@ public class Historian {
 		this.numHandsPlayed = 0;
 		this.currentState = GameState.PREFLOP;
 		this.roundRaiseCount = 0;
-		this.startingTime = startingTime;
 		
 		roundRaiseCount = 0; // how many raises in this round of betting
 		preFlopRaiser = false; // whether or not opponent the initial pre-flop raiser

@@ -11,7 +11,6 @@ public class Player {
 	private int numHands;
 	private boolean cons;
 	private int consEarnings, regEarnings;
-	
 	public Player(PrintWriter output, BufferedReader input) {
 		this.outStream = output;
 		this.inStream = input;
@@ -73,9 +72,8 @@ public class Player {
 			int stackSize =    Integer.parseInt(tokens[3]);
 			int bb =           Integer.parseInt(tokens[4]);
 			numHands =         Integer.parseInt(tokens[5]);
-			double startingTime =     Double.parseDouble(tokens[6]);
 			
-			maj = new Historian(myName, oppName, stackSize, bb, startingTime);
+			maj = new Historian(myName, oppName, stackSize, bb);
 			//newGame();
 		} 
 		

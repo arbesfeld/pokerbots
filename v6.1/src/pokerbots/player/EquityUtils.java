@@ -98,10 +98,7 @@ public class EquityUtils {
 		int r1 = 2;
 		int r2 = 3;
 		int r3 = 6;
-		double suitedness = 0.0;
-//		if(hand[0].suit == hand[1].suit && hand[1].suit == hand[2].suit) {
-//			suitedness = 0.018;
-//		}
-		return (r1 * handVal[0] + r2 * handVal[1] + r3 * handVal[2]) / (r1 + r2 + r3) - suitedness;
+		
+		return (r1 * handVal[0] + r2 * handVal[1] + r3 * handVal[2]) / (r1 + r2 + r3);
 	}
 }

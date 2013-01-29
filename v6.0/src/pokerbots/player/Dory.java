@@ -8,8 +8,8 @@ public class Dory {
 	ArrayList<Integer>[] myRaiseHistory;
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
-	double pfRaiseFactor = 0.00026; 
-	double pfCallFactor = 0.05; 
+	double pfRaiseFactor = 0.00026;
+	double pfCallFactor = 0.05;
 	double pfCheckFactor = 0.15;
 	double callRaiseFactor = 0.02;
 	
@@ -298,7 +298,7 @@ public class Dory {
 		return (double)amountToPut / (amountToPut + brain.potSize); 
 	}
 	public double liqEquity() {
-		return brain.equity + changeEquity * 0.7 / brain.equity + changeEquityCall + changeEquityTemp;
+		return brain.equity + changeEquity + changeEquityCall + changeEquityTemp;
 	}
 	
 }

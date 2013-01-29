@@ -39,17 +39,10 @@ public class Brain {
 		maj.setHand(dory, this);
 		swapSkip = false;
 		skip1 = 2;
-		skip2 = 1;
-		if(timebank < maj.startingTime * 0.3) {
-			System.out.println("USING APPROX 0.2");
+		skip2 = 3;
+		if(timebank < 30) {
 			skip2 = 3;
 		}
-		if(timebank < maj.startingTime * 0.1) {
-			System.out.println("USING APPROX 0.1");
-			skip1 = 5;
-			skip2 = 4;
-		}
-		
 		ec = new EquityCalculator(hand, null, skip1, skip2, swapSkip);
 		this.hand = hand;
 		
