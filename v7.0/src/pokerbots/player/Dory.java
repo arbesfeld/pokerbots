@@ -279,28 +279,6 @@ public class Dory {
 		else
 			return  (0.25 / (1 - AGGROFREQ) - 0.5) / aggroFreqDivFactor + 0.5;
 	}
-	
-	public int lastOpponentRaiseSize() {
-		return theirRaiseHistory[currentState.ordinal()].get(theirRaiseHistory[currentState.ordinal()].size() - 1);
-	}
-	
-	public boolean hasOpponentRaisedThisStreet() {
-		return theirRaiseHistory[currentState.ordinal()].size() > 0;
-	}
-
-	public boolean hasOpponentRaisedTwiceThisStreet() {
-		return theirRaiseHistory[currentState.ordinal()].size() > 1;
-	}
-	
-	public boolean hasOpponentCheckedThisStreet() {
-		return checkHistory[currentState.ordinal()];
-	}
-	public boolean hasOpponentBetThisStreet() {
-		return betHistory[currentState.ordinal()] > 0;
-	}
-	public int opponentBetSizeThisStreet() {
-		return betHistory[currentState.ordinal()];
-	}
 	public double potOdds() {
 		int amountToPut = theirBetsThisStreet - myBetsThisStreet;
 		return (double)amountToPut / (amountToPut + brain.potSize); 

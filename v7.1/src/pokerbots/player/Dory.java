@@ -154,7 +154,7 @@ public class Dory {
 		double TWOB = maj.get2BetRate();
 		
 		if(myRaiseHistory[currentState.ordinal()].size() == 1 && theirRaiseHistory[currentState.ordinal()].size() == 1) {
-			logFactor *= 1.0 + (0.15 - TWOB) * 0.5;
+			logFactor *= 1.0 + (0.15 - TWOB);
 		}
 		else if(theirRaiseHistory[currentState.ordinal()].size() == 2) {
 			logFactor *= 1.0 + (0.3 - THREEB) * 1.5;

@@ -40,7 +40,7 @@ public class Brain {
 		swapSkip = false;
 		skip1 = 2;
 		skip2 = 3;
-		if(timebank < maj.startingTime * 0.3) {
+		if(timebank < maj.startingTime * 0.4) {
 			System.out.println("USING APPROX 0.2");
 			skip2 = 3;
 		}

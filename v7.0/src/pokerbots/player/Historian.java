@@ -56,7 +56,7 @@ public class Historian {
 	// default stats (the "placeholder" values we use when calculating stuff")
 	private double vpip = 0.8;
 	private double pfr = 0.5;
-	private double threeB = 0.15;
+	private double threeB = 0.25;
 	private double pfrFold = 0.3;
 	private double threeBFold = 0.4;
 	private double wtsd = 0.5;
