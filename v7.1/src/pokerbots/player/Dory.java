@@ -154,13 +154,13 @@ public class Dory {
 		double TWOB = maj.get2BetRate();
 		
 		if(myRaiseHistory[currentState.ordinal()].size() == 1 && theirRaiseHistory[currentState.ordinal()].size() == 1) {
-			logFactor *= 1.0 + (0.15 - TWOB);
+			logFactor *= 1.0 + (0.2 - TWOB) * Math.min(100.0, myRaiseHistory[currentState.ordinal()].get(0)) / 30.0;
 		}
 		else if(theirRaiseHistory[currentState.ordinal()].size() == 2) {
-			logFactor *= 1.0 + (0.3 - THREEB) * 1.5;
+			logFactor *= 1.0 + (0.25 - THREEB) * 1.5;
 		}
 		else if(theirRaiseHistory[currentState.ordinal()].size() >= 3) {
-			logFactor *= 1.0 + (0.3 - THREEB) * 3.0;
+			logFactor *= 1.0 + (0.25 - THREEB) * 3.0;
 		}
 		
 		if(currentState == GameState.PREFLOP) { 
