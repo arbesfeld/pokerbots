@@ -264,7 +264,7 @@ public class Dory {
 	}
 	
 	private double adjustPFR(double PFR) {
-		if (PFR >= 0.5)
+		if (PFR > 0.5)
 			return (PFR - 0.5) / pfrDivFactor + 0.5;
 		else
 			return  (0.25 / (1 - PFR) - 0.5) / pfrDivFactor + 0.5;
@@ -273,7 +273,7 @@ public class Dory {
 	private double adjustAggro(double AGGRO) {
 		AGGRO /= 3.0;
 		
-		if (AGGRO >= 0.5)
+		if (AGGRO > 0.5)
 			return Math.min(3.0, (AGGRO - 0.5) / aggroDivFactor + 0.5);
 		else
 			return (0.25 / (1 - AGGRO) - 0.5) / aggroDivFactor + 0.5;
@@ -284,6 +284,9 @@ public class Dory {
 			return (AGGROFREQ - 0.5) / aggroFreqDivFactor + 0.5;
 		else
 			return  (0.25 / (1 - AGGROFREQ) - 0.5) / aggroFreqDivFactor + 0.5;
+	}
+	public boolean hasOppRaisedThisStreet() {
+		return theirRaiseHistory[currentState.ordinal()].size() > 0;
 	}
 	public double potOdds() {
 		int amountToPut = theirBetsThisStreet - myBetsThisStreet;

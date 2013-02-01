@@ -9,7 +9,7 @@ public class Dory {
 	boolean[] checkHistory;   		   //has opponent checked this street?
 	int[] betHistory;                  //opponent can only bet once
 	double pfRaiseFactor = 0.00026;
-	double postFlopRaiseFactor = 0.00027;
+	double postFlopRaiseFactor = 0.0005;
 	double pfCallFactor = 0.05; //has no effect
 	double pfCheckFactor = 0.25;
 	double callRaiseFactor = 0.02; // has no effect
